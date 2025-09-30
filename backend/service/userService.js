@@ -11,7 +11,7 @@ const userCollection = db.collection('Users')
 
 //Regex Pattern
 //https://www.w3schools.com/js/js_regexp.asp 
-const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{10,128}$/ 
+const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*#?&]).{10,25}$/;
 const IDNUMBER_REGEX = /^\d{13}$/
 const ACCOUNTNUMBER_REGEX = /^[0-9]+$/
 const USERNAME_REGEX = /^[a-zA-Z][a-zA-Z0-9_]{2,15}$/
@@ -36,7 +36,7 @@ async function loginUser(data) {
 
     try {
         // Find user by Username
-        const user = await userCollection.findOne({username });
+        const user = await userCollection.findOne({ username });
         if (!user) {
             throw new Error("Invalid username, account number or password");
         }
@@ -55,7 +55,7 @@ async function loginUser(data) {
 
         // Generate JWT token
         const token = jwt.sign(
-        { username },
+        { id: user._id, username: user.username, role: user.role },
         process.env.JWT_SECRET,
         { expiresIn: "1h" }
         );
