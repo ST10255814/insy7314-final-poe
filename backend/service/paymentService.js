@@ -31,6 +31,32 @@ async function CreatePayment(user, data) {
         const db = client.db('INSY7314-POE');
         const PaymentsCollection = db.collection('Payments');
 
+        //validate payment amount
+        if (data.amount <= 0) {
+            throw new Error("Payment amount must be greater than zero");
+        }
+
+        //validate currency
+        const validCurrencies = ['USD', 'EUR', 'GBP', 'ZAR'];
+        if (!validCurrencies.includes(data.currency)) {
+            throw new Error(`Invalid currency. Supported currencies are: ${validCurrencies.join(", ")}`);
+        }
+
+        //validate account number format
+        const ACCOUNTNUMBER_REGEX = /^[0-9]+$/;
+
+        if (!ACCOUNTNUMBER_REGEX.test(data.accountNumber)) {
+            throw new Error("Invalid account number format. Account number must be numeric.");
+        }
+
+        //validate swift code format
+        const SWIFTCODE_REGEX = /^[A-Za-z]{6}[A-Za-z0-9]{2}([A-Za-z0-9]{3})?$/;
+
+        if (!SWIFTCODE_REGEX.test(data.swiftCode)) {
+            throw new Error("Invalid SWIFT code format.");
+        }
+
+        //hash account number before storage
         //salt account number before storage
         const salt = await bcrypt.genSalt(10);
         const hashedAccountNumber = await bcrypt.hash(data.accountNumber, salt);
@@ -57,7 +83,7 @@ async function CreatePayment(user, data) {
         return { id: result.insertedId, ...newPayment };
     } catch (error) {
         console.error(`Error creating payment intent for user ${user.id}: ${error.message}`);
-        throw new Error('Error creating payment intent');
+        throw new Error(error.message);
     }
 }
 
