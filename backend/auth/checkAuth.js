@@ -5,8 +5,16 @@ dotenv.config();
 //https://youtu.be/mbsmsi7l3r4?si=pUG8Z117F1qiyz2J
 const checkAuth = (req, res, next) => {
     try {
-        const token = req.headers.authorization.split(' ')[1];
-        jwt.verify(token, process.env.JWT_SECRET);
+        // Get token from HTTP-only cookie instead of Authorization header
+        const token = req.cookies.authToken;
+        
+        if (!token) {
+            return res.status(401).json({ message: "Access denied. No token provided." });
+        }
+        
+        // Verify the token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = decoded; // Add user info to request object
         next();
     } catch (err) {
         console.error(err);
