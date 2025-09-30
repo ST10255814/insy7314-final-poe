@@ -1,13 +1,14 @@
 //Services to be used 
 const paymentService = require('../service/paymentService')
-
-exports.getAllPayments = async(_, res) =>{ 
-    try {
-        const payments = await paymentService.getAllPayments()
-        console.log(``)
-        
+    
+exports.getAllPayments = async(req, res) =>{ 
+    try{
+        const user = req.user; // Retrieved from checkAuth middleware
+        console.log(`Fetching payments for user: ${user.id}`);
+        const payments = await paymentService.getAllPayments(user.id)
+        res.status(200).json(payments)
     } catch (error) {
-        
+        res.status(500).json({ error: error.message })
     }
 
 }
