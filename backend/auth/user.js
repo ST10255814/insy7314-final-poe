@@ -15,7 +15,5 @@ router.post('/api/logout', userController.logoutUser)
 
 //Payment endpoints
 router.get('/api/pastPayments', checkAuth, paymentController.getAllPayments)
-router.post('/api/createPayment', checkAuth, paymentController.createPaymentIntent)
-router.post('/api/confirmPayment', checkAuth, paymentController.confirmPayment)
-
+router.post('/api/createPayment', checkAuth, paymentController.CreatePayment)
 module.exports = router

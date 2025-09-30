@@ -1,5 +1,7 @@
+
 const { client } = require('../database/db');
 const { ObjectId } = require('mongodb');
+const bcrypt = require('bcrypt');
 
 function toObjectId(id) {
   if (id instanceof ObjectId) return id;
@@ -23,4 +25,40 @@ async function getAllPayments(user){
   }
 }
 
-module.exports = { getAllPayments };
+//create payment
+async function CreatePayment(user, data) {
+    try {
+        const db = client.db('INSY7314-POE');
+        const PaymentsCollection = db.collection('Payments');
+
+        //salt account number before storage
+        const salt = await bcrypt.genSalt(10);
+        const hashedAccountNumber = await bcrypt.hash(data.accountNumber, salt);
+
+        const accountInformation = {
+            accountNumber: hashedAccountNumber,
+            branchCode: data.branchCode,
+            accountType: data.accountType,
+            accountHolderName: data.accountHolderName,
+            swiftCode: data.swiftCode
+        };
+
+        const newPayment = {
+            userId: toObjectId(user.id),
+            amount: data.amount,
+            currency: data.currency,
+            serviceProvider: data.serviceProvider,
+            accountInformation,
+            status: 'pending',
+            createdAt: new Date()
+        };
+        const result = await PaymentsCollection.insertOne(newPayment);
+        console.log(`Payment intent created for user ${user.id}: ${JSON.stringify(newPayment, null, 2)}`);
+        return { id: result.insertedId, ...newPayment };
+    } catch (error) {
+        console.error(`Error creating payment intent for user ${user.id}: ${error.message}`);
+        throw new Error('Error creating payment intent');
+    }
+}
+
+module.exports = { getAllPayments, CreatePayment };
