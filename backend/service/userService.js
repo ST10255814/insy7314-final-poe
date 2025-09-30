@@ -9,9 +9,12 @@ const salt = 10
 const db = client.db('INSY7314-POE')
 const userCollection = db.collection('Users')
 
-//Regex Patterns
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{10,128}$/;
+//Regex Pattern
+//https://www.w3schools.com/js/js_regexp.asp 
+const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{10,128}$/ 
+const IDNUMBER_REGEX = /^\d{13}$/
+const ACCOUNTNUMBER_REGEX = /^[0-9]+$/
+const USERNAME_REGEX = /^[a-zA-Z][a-zA-Z0-9_]{2,15}$/
 
 async function loginUser(data) {
     const { email, password } = data;
@@ -53,33 +56,44 @@ async function loginUser(data) {
 }
 
 async function registerUser(data) {
-    const { email, password } = data;
+    const { fullName, idNumber, accountNumber, username,  password } = data;
 
-    if (!email || !password) {
-        throw new Error("Email and password are required");
-    }
-
-    //Check regex patterns against inputs
-    if(!EMAIL_REGEX.test(email)){
-        throw new Error("Invalid email format")
+    if (!fullName || !idNumber || !accountNumber || !password) {
+        throw new Error("All fields are required");
     }
 
     if(!PASSWORD_REGEX.test(password)){
         throw new Error("Invalid password format. Please include a number, uppercase and a special character and ensure its 10 characters in length")
     }
 
+    if(!IDNUMBER_REGEX.test(idNumber)){
+        throw new Error("Invalid id format. Must be 13 characters long and contain only digits")
+    }
+    if(!ACCOUNTNUMBER_REGEX.test(accountNumber)){
+        throw new Error("Invalid account number")
+    }
+    if(!USERNAME_REGEX.test(username)){
+        throw new Error("Invalid username. Username must start with a letter and be a minimum of 3 characters")
+    }
+
     try {
         // Check if user already exists
-        const existingUser = await userCollection.findOne({ email });
+        const existingUser = await userCollection.findOne({ idNumber }); //Find user by idNumber
         if (existingUser) {
             throw new Error("User already exists");
         }
 
         // Hash password
         const hashedPassword = await bcrypt.hash(password, salt);
+        const hashedId = await bcrypt.hash(idNumber, salt)
+        const hashedAccountNumber = await bcrypt.hash(accountNumber, salt)
 
         const newUser = {
-            email,
+            fullName: fullName,
+            idNumber: hashedId,
+            accountNumber: hashedAccountNumber,
+            username: username,
+            role: "Customer",
             password: hashedPassword,
             createdAt: new Date()
         };
@@ -90,14 +104,11 @@ async function registerUser(data) {
             throw new Error("Failed to insert user");
         }
 
-        //Sign user with JWT token
-        
-
         const userId = result.insertedId; //Get the user ID
 
         return {
             _id: userId,
-            email: newUser.email,
+            username: newUser.username,
             createdAt: newUser.createdAt,
             message: "User registered Successfully"
         };
