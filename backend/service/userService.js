@@ -75,7 +75,7 @@ async function loginUser(data) {
 async function registerUser(data) {
     const { fullName, idNumber, accountNumber, username,  password } = data;
 
-    if (!fullName || !idNumber || !accountNumber || !password) {
+    if (!fullName || !idNumber || !accountNumber || !password || !username) {
         throw new Error("All fields are required");
     }
 
@@ -95,7 +95,7 @@ async function registerUser(data) {
 
     try {
         // Check if user already exists
-        const existingUser = await userCollection.findOne({ idNumber }); //Find user by idNumber
+        const existingUser = await userCollection.findOne({ username }); //Find user by username
         if (existingUser) {
             throw new Error("User already exists");
         }
