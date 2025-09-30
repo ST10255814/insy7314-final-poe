@@ -10,4 +10,6 @@ const userController = require('../controller/userController')
 router.post('/api/login', rateLimiter.userLimiter, userController.loginUser)
 router.post('/api/register', rateLimiter.userLimiter, userController.registerUser)
 
+//Payment endpoints
+router.get('/api/pastPayments', userController)
 module.exports = router
