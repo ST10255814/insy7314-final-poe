@@ -90,6 +90,9 @@ async function registerUser(data) {
             throw new Error("Failed to insert user");
         }
 
+        //Sign user with JWT token
+        
+
         const userId = result.insertedId; //Get the user ID
 
         return {
