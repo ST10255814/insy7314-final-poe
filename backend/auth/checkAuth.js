@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const dotenv = require("dotenv");
 dotenv.config();
 
+//https://youtu.be/mbsmsi7l3r4?si=pUG8Z117F1qiyz2J
 const checkAuth = (req, res, next) => {
     try {
         const token = req.headers.authorization.split(' ')[1];
