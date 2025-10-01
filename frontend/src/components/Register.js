@@ -109,7 +109,7 @@ export default function Register() {
         </button>
         <p>
           Already have an account?{" "}
-          <a href="/register">
+          <a href="/login">
             Login
           </a>
         </p>
