@@ -19,6 +19,7 @@ exports.loginUser = async (req, res) => {
         const user = await userService.loginUser(req.body)
         
         // Set secure HTTP-only cookie to prevent XSS
+        //https://medium.com/@dev.arunengineer/step-by-step-guide-to-setting-cookies-in-react-js-node-app-024ae73625dc
         res.cookie('authToken', user.token, {
             httpOnly: true,        // Prevents JavaScript access (XSS protection)
             secure: true,          // Only send over HTTPS
