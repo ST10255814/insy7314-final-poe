@@ -1,7 +1,7 @@
-
 const { client } = require('../database/db');
 const { ObjectId } = require('mongodb');
 const bcrypt = require('bcrypt');
+const { validateAndSanitize, validateAmount, VALIDATION_PATTERNS } = require('../utils/validation');
 
 function toObjectId(id) {
   if (id instanceof ObjectId) return id;
@@ -11,7 +11,6 @@ function toObjectId(id) {
   throw new Error("Invalid id format: must be a valid ObjectId string");
 }
 
-//Get all logged in user past payments
 async function getAllPayments(user){
   try {
     const db = client.db('INSY7314-POE');
@@ -25,59 +24,49 @@ async function getAllPayments(user){
   }
 }
 
-//create payment
 async function CreatePayment(user, data) {
     try {
         const db = client.db('INSY7314-POE');
         const PaymentsCollection = db.collection('Payments');
 
-        //validate payment amount
-        if (data.amount <= 0) {
-            throw new Error("Payment amount must be greater than zero");
-        }
+        // Validate and sanitize all payment inputs
+        const amount = validateAmount(data.amount);
+        const currency = validateAndSanitize('Currency', data.currency, VALIDATION_PATTERNS.CURRENCY);
+        const serviceProvider = validateAndSanitize('Service Provider', data.serviceProvider, VALIDATION_PATTERNS.SERVICEPROVIDER);
+        const accountNumber = validateAndSanitize('Account Number', data.accountNumber, VALIDATION_PATTERNS.ACCOUNTNUMBER);
+        const branchCode = validateAndSanitize('Branch Code', data.branchCode, VALIDATION_PATTERNS.BRANCHCODE);
+        const accountType = validateAndSanitize('Account Type', data.accountType, VALIDATION_PATTERNS.ACCOUNTTYPE);
+        const accountHolderName = validateAndSanitize('Account Holder Name', data.accountHolderName, VALIDATION_PATTERNS.ACCOUNTHOLDERNAME);
+        const swiftCode = validateAndSanitize('SWIFT Code', data.swiftCode, VALIDATION_PATTERNS.SWIFTCODE);
 
-        //validate currency
+        // Additional validation
         const validCurrencies = ['USD', 'EUR', 'GBP', 'ZAR'];
-        if (!validCurrencies.includes(data.currency)) {
+        if (!validCurrencies.includes(currency)) {
             throw new Error(`Invalid currency. Supported currencies are: ${validCurrencies.join(", ")}`);
         }
 
-        //validate account number format
-        const ACCOUNTNUMBER_REGEX = /^[0-9]+$/;
-
-        if (!ACCOUNTNUMBER_REGEX.test(data.accountNumber)) {
-            throw new Error("Invalid account number format. Account number must be numeric.");
-        }
-
-        //validate swift code format
-        const SWIFTCODE_REGEX = /^[A-Za-z]{6}[A-Za-z0-9]{2}([A-Za-z0-9]{3})?$/;
-
-        if (!SWIFTCODE_REGEX.test(data.swiftCode)) {
-            throw new Error("Invalid SWIFT code format.");
-        }
-
-        //hash account number before storage
-        //salt account number before storage
+        // Hash account number before storage
         const salt = await bcrypt.genSalt(10);
-        const hashedAccountNumber = await bcrypt.hash(data.accountNumber, salt);
+        const hashedAccountNumber = await bcrypt.hash(accountNumber, salt);
 
         const accountInformation = {
             accountNumber: hashedAccountNumber,
-            branchCode: data.branchCode,
-            accountType: data.accountType,
-            accountHolderName: data.accountHolderName,
-            swiftCode: data.swiftCode
+            branchCode,
+            accountType,
+            accountHolderName,
+            swiftCode
         };
 
         const newPayment = {
             userId: toObjectId(user.id),
-            amount: data.amount,
-            currency: data.currency,
-            serviceProvider: data.serviceProvider,
+            amount,
+            currency,
+            serviceProvider,
             accountInformation,
             status: 'pending',
             createdAt: new Date()
         };
+        
         const result = await PaymentsCollection.insertOne(newPayment);
         console.log(`Payment intent created for user ${user.id}: ${JSON.stringify(newPayment, null, 2)}`);
         return { id: result.insertedId, ...newPayment };

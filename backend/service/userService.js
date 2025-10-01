@@ -2,6 +2,7 @@ const { client } = require('../database/db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const dotenv = require("dotenv");
+const { validateAndSanitize, VALIDATION_PATTERNS } = require('../utils/validation');
 dotenv.config();
 
 //Declare salt variable and collection/client to be used
@@ -9,129 +10,109 @@ const salt = 10
 const db = client.db('INSY7314-POE')
 const userCollection = db.collection('Users')
 
-//Regex Pattern
-//https://www.w3schools.com/js/js_regexp.asp 
-const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*#?&]).{10,25}$/;
-const IDNUMBER_REGEX = /^\d{13}$/
-const ACCOUNTNUMBER_REGEX = /^[0-9]+$/
-const USERNAME_REGEX = /^[a-zA-Z][a-zA-Z0-9_]{2,15}$/
-
 async function loginUser(data) {
-    const { accountNumber, password, username } = data;
-
-    if ( !accountNumber || !password|| !username) {
-        throw new Error("All fields are required");
-    }
-    if(!PASSWORD_REGEX.test(password)){
-        throw new Error("Invalid password format. Please include a number, uppercase and a special character and ensure its 10 characters in length")
-    }
-
-    if(!ACCOUNTNUMBER_REGEX.test(accountNumber)){
-        throw new Error("Invalid account number")
-    }
-
-    if(!USERNAME_REGEX.test(username)){
-        throw new Error("Invalid username. Username must start with a letter and be a minimum of 3 characters")
-    }
-
     try {
+        // Validate and sanitize all inputs
+        const accountNumber = validateAndSanitize('Account Number', data.accountNumber, VALIDATION_PATTERNS.ACCOUNTNUMBER);
+        const password = validateAndSanitize('Password', data.password, VALIDATION_PATTERNS.PASSWORD);
+        const username = validateAndSanitize('Username', data.username, VALIDATION_PATTERNS.USERNAME);
+
+        if (!accountNumber || !password || !username) {
+            throw new Error('All fields are required');
+        }
+
         // Find user by Username
-        const user = await userCollection.findOne({ username });
-        if (!user) {
-            throw new Error("Invalid username, account number or password");
+        const existingUser = await userCollection.findOne({ 
+            accountNumber: accountNumber,
+            username: username 
+        });
+
+        if (!existingUser) {
+            throw new Error('Invalid credentials');
         }
 
         // Compare password
-        const isPasswordMatch = await bcrypt.compare(password, user.password);
-        if (!isPasswordMatch) {
-            throw new Error("Invalid username, account number or password");
-        }
+        const passwordMatch = await bcrypt.compare(password, existingUser.password);
 
-        // Compare account number
-        const isAccountNumberMatch = await bcrypt.compare(accountNumber, user.accountNumber);
-        if (!isAccountNumberMatch) {
-            throw new Error("Invalid username, account number or password");
+        if (!passwordMatch) {
+            throw new Error('Invalid credentials');
         }
 
         // Generate JWT token
         const token = jwt.sign(
-        { id: user._id, username: user.username, role: user.role },
-        process.env.JWT_SECRET,
-        { expiresIn: "1h" }
+            { id: existingUser._id, username: existingUser.username },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
         );
 
         // Return safe response
         return {
-            message: "Login successful",
-            userId: user._id,
-            username: user.username,
-            token: token
+            id: existingUser._id,
+            username: existingUser.username,
+            fullName: existingUser.fullName,
+            accountNumber: existingUser.accountNumber,
+            token
         };
+
     } catch (error) {
-        throw new Error(`Error logging in: ${error.message}`);
+        console.error(`Login error: ${error.message}`);
+        throw error;
     }
 }
 
 async function registerUser(data) {
-    const { fullName, idNumber, accountNumber, username,  password } = data;
-
-    if (!fullName || !idNumber || !accountNumber || !password || !username) {
-        throw new Error("All fields are required");
-    }
-
-    if(!PASSWORD_REGEX.test(password)){
-        throw new Error("Invalid password format. Please include a number, uppercase and a special character and ensure its 10 characters in length")
-    }
-
-    if(!IDNUMBER_REGEX.test(idNumber)){
-        throw new Error("Invalid id format. Must be 13 characters long and contain only digits")
-    }
-    if(!ACCOUNTNUMBER_REGEX.test(accountNumber)){
-        throw new Error("Invalid account number")
-    }
-    if(!USERNAME_REGEX.test(username)){
-        throw new Error("Invalid username. Username must start with a letter and be a minimum of 3 characters")
-    }
-
     try {
+        // Validate and sanitize all inputs
+        const fullName = validateAndSanitize('Full Name', data.fullName, VALIDATION_PATTERNS.FULLNAME);
+        const idNumber = validateAndSanitize('ID Number', data.idNumber, VALIDATION_PATTERNS.IDNUMBER);
+        const accountNumber = validateAndSanitize('Account Number', data.accountNumber, VALIDATION_PATTERNS.ACCOUNTNUMBER);
+        const username = validateAndSanitize('Username', data.username, VALIDATION_PATTERNS.USERNAME);
+        const password = validateAndSanitize('Password', data.password, VALIDATION_PATTERNS.PASSWORD);
+
+        if (!fullName || !idNumber || !accountNumber || !password || !username) {
+            throw new Error('All fields are required');
+        }
+
         // Check if user already exists
-        const existingUser = await userCollection.findOne({ username }); //Find user by username
+        const existingUser = await userCollection.findOne({
+            $or: [
+                { accountNumber: accountNumber },
+                { username: username },
+                { idNumber: idNumber }
+            ]
+        });
+
         if (existingUser) {
-            throw new Error("User already exists");
+            throw new Error('User already exists with this account number, username, or ID number');
         }
 
         // Hash password
         const hashedPassword = await bcrypt.hash(password, salt);
-        const hashedId = await bcrypt.hash(idNumber, salt)
-        const hashedAccountNumber = await bcrypt.hash(accountNumber, salt)
 
         const newUser = {
-            fullName: fullName,
-            idNumber: hashedId,
-            accountNumber: hashedAccountNumber,
-            username: username,
-            role: "Customer",
+            fullName,
+            idNumber,
+            accountNumber,
+            username,
             password: hashedPassword,
             createdAt: new Date()
         };
 
         // Insert into collection
         const result = await userCollection.insertOne(newUser);
-        if (!result.acknowledged) {
-            throw new Error("Failed to insert user");
-        }
-
-        const userId = result.insertedId; //Get the user ID
+        console.log(`User registered successfully: ${result.insertedId}`);
 
         return {
-            _id: userId,
-            username: newUser.username,
-            createdAt: newUser.createdAt,
-            message: "User registered Successfully"
+            id: result.insertedId,
+            fullName,
+            username,
+            accountNumber,
+            message: 'User registered successfully'
         };
 
     } catch (error) {
-        throw new Error(`Error registering user: ${error.message}`);
+        console.error(`Registration error: ${error.message}`);
+        throw error;
     }
 }
 
