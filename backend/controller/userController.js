@@ -34,8 +34,8 @@ exports.loginUser = async (req, res) => {
         // Set secure HTTP-only cookie to prevent XSS
         res.cookie('authToken', user.token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            secure: true,
+            sameSite: 'none',
             maxAge: 3600000,
             path: '/'
         });
@@ -53,13 +53,13 @@ exports.loginUser = async (req, res) => {
     }
 };
 
-exports.logoutUser = async (req, res) => {
+exports.logoutUser = async (_, res) => {
     try {
         // Clear the authentication cookie
         res.clearCookie('authToken', {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            secure: true,
+            sameSite: 'none',
             path: '/'
         });
         

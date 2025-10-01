@@ -23,7 +23,6 @@ async function loginUser(data) {
 
         // Find user by Username
         const existingUser = await userCollection.findOne({ 
-            accountNumber: accountNumber,
             username: username 
         });
 
