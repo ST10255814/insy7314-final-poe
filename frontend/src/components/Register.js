@@ -25,7 +25,7 @@ export default function Register() {
     setLoading(true);
 
     try {
-      const res = await api.post("/register", formData);
+      const res = await api.post("/api/register", formData);
       setSuccess(res.data.message || "User registered successfully!");
       setFormData({
         fullName: "",
