@@ -38,8 +38,8 @@ export default function Navbar() {
 
   return (
     <nav>
-      <h1>International Payment System</h1>
       <div>
+        <h1>International Payment System</h1>
         {/*Assign nav bar depending on if the user is logged in or not*/}
         {user ? (
           <div>
