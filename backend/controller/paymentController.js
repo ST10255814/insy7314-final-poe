@@ -17,7 +17,7 @@ exports.getAllPayments = async(req, res) =>{
 exports.CreatePayment = async (req, res) => {
     try {
         const user = req.user; // Retrieved from checkAuth middleware
-        console.log(`Creating payment intent for user: ${user.id}`);
+        console.log(`Creating payment for user: ${user.id}`);
         const paymentData = req.body;
         const paymentIntent = await paymentService.CreatePayment(user, paymentData);
         res.status(200).json(paymentIntent);
