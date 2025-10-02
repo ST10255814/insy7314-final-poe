@@ -49,7 +49,7 @@ export default function PastPayments() {
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-xl font-bold text-[#007786]">
                     Amount: {""}
-                    {payment.amount} {payment.currency}
+                    {payment.amount.toLocaleString()} {payment.currency}
                   </h3>
                   <span
                     className={`px-3 py-1 rounded-full text-sm font-medium ${
