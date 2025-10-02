@@ -4,26 +4,39 @@ import { NavLink, useNavigate } from 'react-router-dom';
 //https://www.npmjs.com/package/react-icons
 import { FaSignOutAlt, FaUserCircle, FaMoneyCheckAlt, FaHistory } from "react-icons/fa";
 import api from '../lib/axios';
+import { toast, Slide } from 'react-toastify'
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
 
   const user = JSON.parse(localStorage.getItem("user"));
 
   const handleLogout = async () => {
     try {
       const res = await api.post('/api/logout', {}, { withCredentials: true });
-      setMessage(res.data.message);
-      setError("");
+      toast.success(res.data.message || 'Logged out successfully', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "light",
+        transition: Slide,
+      });
       localStorage.removeItem("user");
       navigate("/login");
-      setTimeout(() => setMessage(""), 3000);
     } catch (err) {
-      setError(err.response?.data?.error || "Logout failed");
-      setMessage("");
-      setTimeout(() => setError(""), 3000);
+      toast.success(err.response?.data?.error || 'Logout failed', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "light",
+        transition: Slide,
+      });
     }
   };
 
@@ -128,10 +141,6 @@ export default function Navbar() {
             </>
           )}
         </div>
-      </div>
-      <div className="mt-2 text-center">
-        {message && <p className="text-[#007786] animate-fadeIn">{message}</p>}
-        {error && <p className="text-red-600 animate-fadeIn">{error}</p>}
       </div>
     </nav>
   );

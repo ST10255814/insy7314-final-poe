@@ -56,10 +56,10 @@ export default function Login() {
   };
   //https://chatgpt.com/share/68de71ec-5710-8012-8bac-679bf1123dbc styling help
   return (
-    <div className="min-h-screen flex justify-center items-start bg-gray-50 px-4 relative overflow-hidden">
+    <div className="min-h-screen flex justify-center items-start px-4 relative overflow-hidden">
       {/* Login Form */}
       <div className="w-full max-w-md mt-32 relative z-10">
-        <div className="bg-white shadow-lg rounded-2xl p-8 animate-fadeIn">
+        <div className="bg-white shadow-lg rounded-2xl p-8 border-2 border-[#007786] animate-fadeIn">
           <h1 className="text-2xl font-bold text-[#007786] mb-6 text-center">
             Sign In
           </h1>
