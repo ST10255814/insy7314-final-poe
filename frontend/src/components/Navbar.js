@@ -13,7 +13,6 @@ import { toast, Slide } from "react-toastify";
 
 export default function Navbar() {
   const navigate = useNavigate();
-
   const user = JSON.parse(localStorage.getItem("user"));
 
   const handleLogout = async () => {
@@ -45,25 +44,32 @@ export default function Navbar() {
     }
   };
 
-  const activeTextClass = "text-[#007786] font-semibold";
-  const normalTextClass = "text-gray-700 hover:text-[#00a3b0]";
-  const activeIconClass = "text-[#007786] animate-bounce-slow";
-  const normalIconClass = "text-gray-600 group-hover:text-[#00a3b0] transition duration-300";
+  const activeTextClass = "text-[#007768] font-semibold";
+  const normalTextClass =
+    "text-gray-700 hover:text-[#007768] transition duration-300";
+  const activeIconClass = "text-[#007768] animate-bounce-slow";
+  const normalIconClass =
+    "text-gray-600 group-hover:text-[#007768] transition duration-300";
 
   const getUnderlineClass = (path) =>
     window.location.pathname === path
-      ? "absolute bottom-0 left-0 w-full h-0.5 bg-[#007786]"
-      : "absolute bottom-0 left-0 w-0 h-0.5 bg-[#00a3b0] group-hover:w-full transition-all duration-300";
+      ? "absolute bottom-0 left-0 w-full h-0.5 bg-[#007768]"
+      : "absolute bottom-0 left-0 w-0 h-0.5 bg-[#007768] group-hover:w-full transition-all duration-300";
 
   return (
-    <nav className="bg-white shadow-md p-4 w-full">
+    <nav className="bg-white shadow-lg py-4 w-full fixed top-0 z-50">
       <div className="flex items-center justify-between w-full">
-        <h1 className="text-xl font-bold text-[#007786] flex items-center space-x-2">
-          <FaMoneyCheckAlt className="text-[#007786] text-2xl animate-bounce-slow" />
-          <span>International Payment System</span>
+        <h1 className="text-2xl font-bold text-[#007768] flex items-center space-x-1 ml-4">
+          <FaMoneyCheckAlt className="text-3xl animate-bounce-slow" />
+          <NavLink
+            to="/"
+            className="hover:text-[#005f57] transition duration-300"
+          >
+            PayFlow
+          </NavLink>
         </h1>
         {user && (
-          <div className="flex space-x-6 text-lg">
+          <div className="flex space-x-6 absolute left-1/2 transform -translate-x-1/2 text-lg">
             <NavLink
               to="/pastPayments"
               className={({ isActive }) =>
@@ -73,7 +79,7 @@ export default function Navbar() {
               }
             >
               <FaHistory
-                className={({ isActive }) =>
+                className={
                   window.location.pathname === "/pastPayments"
                     ? activeIconClass
                     : normalIconClass
@@ -92,7 +98,7 @@ export default function Navbar() {
               }
             >
               <FaMoneyCheckAlt
-                className={({ isActive }) =>
+                className={
                   window.location.pathname === "/createPayment"
                     ? activeIconClass
                     : normalIconClass
@@ -107,12 +113,12 @@ export default function Navbar() {
           {user ? (
             <>
               <span className="text-gray-800 font-medium flex items-center space-x-1">
-                <FaUserCircle className="text-[#007786] text-lg transition-transform duration-300 group-hover:scale-110" />
+                <FaUserCircle className="text-[#007768] text-xl transition-transform duration-300 group-hover:scale-110" />
                 <span>Welcome, {user}</span>
               </span>
               <button
                 onClick={handleLogout}
-                className="bg-[#007786] text-white px-3 py-1 rounded flex items-center space-x-1 hover:bg-[#005f66] transition duration-300 transform hover:scale-105"
+                className="bg-[#007768] text-white px-3 py-1.5 rounded-full flex items-center space-x-1 hover:bg-[#005f57] shadow-md hover:shadow-lg transition transform hover:scale-105"
               >
                 <FaSignOutAlt className="text-white" />
                 <span>Logout</span>
@@ -123,25 +129,22 @@ export default function Navbar() {
               <NavLink
                 to="/login"
                 className={({ isActive }) =>
-                  `relative group transition transform hover:scale-105 ${
-                    isActive ? activeTextClass : normalTextClass
-                  }`
+                  `px-3 py-1.5 rounded-full border border-[#007768] ${
+                    isActive ? "bg-[#007768] text-white" : "text-[#007768]"
+                  } hover:bg-[#005f57] hover:text-white transition transform hover:scale-105`
                 }
               >
                 Login
-                <span className={getUnderlineClass("/login")}></span>
               </NavLink>
-
               <NavLink
                 to="/register"
                 className={({ isActive }) =>
-                  `relative group transition transform hover:scale-105 ${
-                    isActive ? activeTextClass : normalTextClass
-                  }`
+                  `px-3 py-1.5 rounded-full border border-[#007768] ${
+                    isActive ? "bg-[#007768] text-white" : "text-[#007768]"
+                  } hover:bg-[#005f57] hover:text-white transition transform hover:scale-105`
                 }
               >
                 Register
-                <span className={getUnderlineClass("/register")}></span>
               </NavLink>
             </>
           )}

@@ -7,12 +7,14 @@ import PastPayments from './components/PastPayments';
 import CreatePayment from './components/CreatePayment';
 import Navbar from './components/Navbar';
 import { ToastContainer } from 'react-toastify';
+import Home from './components/Home';
 
 function App() {
   return (
     <Router>
         <Navbar/>
       <Routes>
+        <Route path='/' element={<Home/>} />
         <Route path='/login' element={<Login/>} />
         <Route path='/register' element={<Register/>} />
         <Route path='/pastPayments' element={<PastPayments/>} />
