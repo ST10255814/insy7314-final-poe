@@ -39,7 +39,7 @@ export default function CreatePayment() {
       setLoading(false);
     }
   };
-
+  //https://chatgpt.com/share/68de8211-c89c-8012-b72d-63542a20d6b1
   return (
     <div className="max-w-xl mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg border border-gray-200">
       <h2 className="text-2xl font-bold text-[#007786] mb-4 text-center">Create Payment</h2>
