@@ -79,7 +79,7 @@ export default function Login() {
                   name="username"
                   value={formData.username}
                   onChange={handleChange}
-                  placeholder="Enter your username"
+                  placeholder="Username"
                   className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#007768] focus:border-[#007768] bg-white/70 transition duration-300"
                 />
               </div>
@@ -97,7 +97,7 @@ export default function Login() {
                   name="accountNumber"
                   value={formData.accountNumber}
                   onChange={handleChange}
-                  placeholder="Enter your account number"
+                  placeholder="Account number"
                   className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#007768] focus:border-[#007768] bg-white/70 transition duration-300"
                 />
               </div>
@@ -115,7 +115,7 @@ export default function Login() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  placeholder="Enter your password"
+                  placeholder="Password"
                   className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#007768] focus:border-[#007768] bg-white/70 transition duration-300"
                 />
               </div>
