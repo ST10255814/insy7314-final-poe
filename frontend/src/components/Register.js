@@ -14,8 +14,6 @@ export default function Register() {
     password: "",
   });
 
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -24,8 +22,6 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
     setLoading(true);
 
     try {
@@ -33,8 +29,7 @@ export default function Register() {
       await new Promise((resolve) => setTimeout(resolve, 3000));
       const res = await api.post("/api/register", formData);
       await new Promise((resolve) => setTimeout(resolve, 3000));
-      setSuccess(res.data.message || "User registered successfully!");
-      toast.success(success || 'Login Successful', {
+      toast.success(res.data.message || "User registered successfully!", {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -54,8 +49,7 @@ export default function Register() {
       setLoading(false);
       navigate('/login')
     } catch (err) {
-      setError(err.response?.data?.error || "Registration failed");
-      toast.error(error || 'Login Successful', {
+      toast.error(err.response?.data?.error || "Registration failed", {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
