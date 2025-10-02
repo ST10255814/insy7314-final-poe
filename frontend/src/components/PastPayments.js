@@ -27,13 +27,11 @@ export default function PastPayments() {
         <h2 className="text-3xl font-bold mb-8 text-[#007786] border-b-2 border-[#007786] pb-2">
           Past Payments
         </h2>
-
         {error && (
           <p className="text-red-500 mb-6 bg-red-100 p-3 rounded">{error}</p>
         )}
-
         {payments.length === 0 ? (
-          <p className="text-gray-600 text-center py-10">No payments found.</p>
+          <p className="text-gray-600 font-bold text-center py-10">No payments found.</p>
         ) : (
           <div className="grid gap-6">
             {payments.map((payment, index) => (
@@ -64,7 +62,6 @@ export default function PastPayments() {
                       payment.status.slice(1)}
                   </span>
                 </div>
-
                 {/* Grid for other details */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700">
                   <p>

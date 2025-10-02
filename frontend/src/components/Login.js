@@ -68,42 +68,57 @@ export default function Login() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Username */}
-            <div className="relative">
-              <FaUser className="absolute left-4 top-1/2 -translate-y-1/2 text-[#007768] text-lg" />
-              <input
-                type="text"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                placeholder="Username"
-                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#007768] focus:border-[#007768] shadow-inner bg-white/70 transition duration-300"
-              />
+            <div>
+              <label className="block mb-1 text-gray-700 font-medium">
+                Username
+              </label>
+              <div className="relative">
+                <FaUser className="absolute left-4 top-1/2 -translate-y-1/2 text-[#007768] text-lg" />
+                <input
+                  type="text"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  placeholder="Enter your username"
+                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#007768] focus:border-[#007768] bg-white/70 transition duration-300"
+                />
+              </div>
             </div>
 
             {/* Account Number */}
-            <div className="relative">
-              <FaIdCard className="absolute left-4 top-1/2 -translate-y-1/2 text-[#007768] text-lg" />
-              <input
-                type="text"
-                name="accountNumber"
-                value={formData.accountNumber}
-                onChange={handleChange}
-                placeholder="Account Number"
-                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#007768] focus:border-[#007768] shadow-inner bg-white/70 transition duration-300"
-              />
+            <div>
+              <label className="block mb-1 text-gray-700 font-medium">
+                Account Number
+              </label>
+              <div className="relative">
+                <FaIdCard className="absolute left-4 top-1/2 -translate-y-1/2 text-[#007768] text-lg" />
+                <input
+                  type="text"
+                  name="accountNumber"
+                  value={formData.accountNumber}
+                  onChange={handleChange}
+                  placeholder="Enter your account number"
+                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#007768] focus:border-[#007768] bg-white/70 transition duration-300"
+                />
+              </div>
             </div>
 
             {/* Password */}
-            <div className="relative">
-              <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#007768] text-lg" />
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Password"
-                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#007768] focus:border-[#007768] shadow-inner bg-white/70 transition duration-300"
-              />
+            <div>
+              <label className="block mb-1 text-gray-700 font-medium">
+                Password
+              </label>
+              <div className="relative">
+                <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#007768] text-lg" />
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Enter your password"
+                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#007768] focus:border-[#007768] bg-white/70 transition duration-300"
+                />
+              </div>
             </div>
 
             {/* Submit Button */}
@@ -121,8 +136,7 @@ export default function Login() {
               )}
             </button>
           </form>
-
-          <p className="mt-5 text-center text-gray-700 text-sm">
+          <p className="mt-5 text-center text-gray-700 font-medium">
             Don't have an account?{" "}
             <a
               href="/register"

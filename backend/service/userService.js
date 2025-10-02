@@ -85,14 +85,17 @@ async function registerUser(data) {
             throw new Error('User already exists with this account number, username, or ID number');
         }
 
-        // Hash password
+        // Hash password, idNumber and account number
         const hashedPassword = await bcrypt.hash(safePassword, salt);
+        const hashedAccountNumber = await bcrypt.hash(safeAccountNumber, salt);
+        const hashedIdNumber = await bcrypt.hash(safePassword, salt);
 
         const newUser = {
             fullName: safeFullName,
-            idNumber: safeIdNumber,
-            accountNumber: safeAccountNumber,
+            idNumber: hashedIdNumber,
+            accountNumber: hashedAccountNumber,
             username: safeUsername,
+            role: "Customer",
             password: hashedPassword,
             createdAt: new Date()
         };
@@ -105,7 +108,6 @@ async function registerUser(data) {
             id: result.insertedId,
             fullName: safeFullName,
             username: safeUsername,
-            accountNumber: safeAccountNumber,
             message: 'User registered successfully'
         };
 
