@@ -50,7 +50,7 @@ export default function CreatePayment() {
       );
       setLoading(false);
     } catch (err) {
-      toast.error(err.response?.data?.error || "Something went wrong", {
+      toast.error(err.response?.data?.error || err.response?.data?.message || "Something went wrong", {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,

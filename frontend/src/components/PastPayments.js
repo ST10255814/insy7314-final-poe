@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../lib/axios";
 import { format } from "date-fns";
+import { toast, Slide } from "react-toastify";
 
 export default function PastPayments() {
   const [payments, setPayments] = useState([]);
@@ -14,8 +15,7 @@ export default function PastPayments() {
         });
         setPayments(res.data);
       } catch (err) {
-        console.error(err);
-        setError("Error fetching payments");
+        setError(err.response?.data?.message);
       }
     };
     fetchPayments();

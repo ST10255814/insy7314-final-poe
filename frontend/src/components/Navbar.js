@@ -32,7 +32,7 @@ export default function Navbar() {
       localStorage.removeItem("user");
       navigate("/login");
     } catch (err) {
-      toast.success(err.response?.data?.error || "Logout failed", {
+      toast.error(err.response?.data?.error || "Logout failed", {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
