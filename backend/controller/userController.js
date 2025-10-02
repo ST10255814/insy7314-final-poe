@@ -42,7 +42,6 @@ exports.loginUser = async (req, res) => {
         });
         
         // Return user data without the token (since it's in cookie now)
-        // eslint-disable-next-line no-unused-vars
         const { token, ...userWithoutToken } = user;
         res.status(200).json({
             message: 'Login successful',
