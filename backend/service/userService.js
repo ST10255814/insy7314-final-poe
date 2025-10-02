@@ -31,6 +31,10 @@ async function loginUser(data) {
         const passwordMatch = await bcrypt.compare(safePassword, existingUser.password);
         if (!passwordMatch) throw new Error('Invalid credentials');
 
+        // Compare AccountNumber
+        const accountNumberMatch = await bcrypt.compare(safeAccountNumber, existingUser.accountNumber)
+        if(!accountNumberMatch) throw new Error('Invalid credentials')
+
         // Generate JWT token
         const token = jwt.sign(
             { id: existingUser._id, username: existingUser.username },
@@ -43,7 +47,6 @@ async function loginUser(data) {
             id: existingUser._id,
             username: existingUser.username,
             fullName: existingUser.fullName,
-            accountNumber: safeAccountNumber,
             token
         };
 
