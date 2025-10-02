@@ -30,7 +30,7 @@ async function CreatePayment(user, data) {
         const PaymentsCollection = db.collection('Payments');
 
         // Validate and sanitize all payment inputs
-        const amount = validateAmount(data.amount);
+        const amount = validateAmount(data.amount, VALIDATION_PATTERNS.AMOUNT);
         const currency = validateAndSanitize('Currency', data.currency, VALIDATION_PATTERNS.CURRENCY);
         const serviceProvider = validateAndSanitize('Service Provider', data.serviceProvider, VALIDATION_PATTERNS.SERVICEPROVIDER);
         const accountNumber = validateAndSanitize('Account Number', data.accountNumber, VALIDATION_PATTERNS.ACCOUNTNUMBER);

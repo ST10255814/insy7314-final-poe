@@ -16,7 +16,6 @@ export default function PastPayments() {
         setError("Error fetching payments");
       }
     };
-
     fetchPayments();
   }, []);
 
@@ -63,11 +62,11 @@ export default function PastPayments() {
               {/* Grid for other details */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700">
                 <p>
-                  <span className="font-medium">Service Provider:</span>{" "}
+                  <span className="font-medium">Bank:</span>{" "}
                   {payment.serviceProvider}
                 </p>
                 <p>
-                  <span className="font-medium">Created At:</span>{" "}
+                  <span className="font-medium">Made on:</span>{" "}
                   {/*https://www.npmjs.com/package/date-fns */}
                   {format(new Date(payment.createdAt), 'MMM dd, yyyy HH:mm a')}
                 </p>

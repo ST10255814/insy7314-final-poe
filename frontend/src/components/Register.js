@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../lib/axios";
 import { FaUser, FaLock, FaIdCard } from "react-icons/fa";
+import { toast, Slide } from "react-toastify";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -33,6 +34,16 @@ export default function Register() {
       const res = await api.post("/api/register", formData);
       await new Promise((resolve) => setTimeout(resolve, 3000));
       setSuccess(res.data.message || "User registered successfully!");
+      toast.success(success || 'Login Successful', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "light",
+        transition: Slide,
+      });
       setFormData({
         fullName: "",
         idNumber: "",
@@ -44,6 +55,16 @@ export default function Register() {
       navigate('/login')
     } catch (err) {
       setError(err.response?.data?.error || "Registration failed");
+      toast.error(error || 'Login Successful', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "light",
+        transition: Slide,
+      });
       setLoading(false);
     }
   };
@@ -55,18 +76,6 @@ export default function Register() {
           <h1 className="text-2xl font-bold text-[#007786] mb-6 text-center">
             Register
           </h1>
-
-          {error && (
-            <div className="bg-red-100 text-red-700 px-4 py-2 rounded mb-4 text-center animate-fadeIn">
-              {error}
-            </div>
-          )}
-          {success && (
-            <div className="bg-green-100 text-green-700 px-4 py-2 rounded mb-4 text-center animate-fadeIn">
-              {success}
-            </div>
-          )}
-
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Full Name */}
             <div className="relative">

@@ -2,6 +2,7 @@ import { useState } from "react";
 import api from "../lib/axios";
 import { useNavigate } from "react-router-dom";
 import { FaUser, FaLock, FaIdCard } from "react-icons/fa";
+import { toast, Slide } from 'react-toastify';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -10,8 +11,6 @@ export default function Login() {
     accountNumber: "",
     password: "",
   });
-
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -20,7 +19,6 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
     try {
       //Promise to allow for a cleaner UI response
@@ -30,9 +28,29 @@ export default function Login() {
       await new Promise((resolve) => setTimeout(resolve, 3000));
       localStorage.setItem("user", JSON.stringify(res.data.user.fullName));
       setLoading(false);
+      toast.success(res.data.message || 'Login Successful', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "light",
+        transition: Slide,
+      });
       navigate("/pastPayments");
     } catch (err) {
-      setError(err.response?.data?.error || "Login failed");
+      //https://fkhadra.github.io/react-toastify/introduction
+      toast.error(err.response?.data?.error || "Login failed", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "light",
+        transition: Slide,
+      });
       setLoading(false);
     }
   };
@@ -45,13 +63,6 @@ export default function Login() {
           <h1 className="text-2xl font-bold text-[#007786] mb-6 text-center">
             Sign In
           </h1>
-
-          {error && (
-            <div className="bg-red-100 text-red-700 px-4 py-2 rounded mb-4 text-center animate-fadeIn">
-              {error}
-            </div>
-          )}
-
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Username */}
             <div className="relative">
@@ -99,7 +110,7 @@ export default function Login() {
               className="w-full bg-[#007786] text-white py-2 rounded-lg font-semibold hover:bg-[#005f66] active:scale-95 transition duration-300 flex items-center justify-center space-x-2"
             >
               {loading ? (
-                <span className="animate-pulse">Signing in...</span>
+                <span className="animate-pulse cursor-not-allowed">Signing in...</span>
               ) : (
                 <span>Sign In</span>
               )}

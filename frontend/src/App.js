@@ -6,6 +6,7 @@ import Register from './components/Register';
 import PastPayments from './components/PastPayments';
 import CreatePayment from './components/CreatePayment';
 import Navbar from './components/Navbar';
+import { ToastContainer } from 'react-toastify';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path='/pastPayments' element={<PastPayments/>} />
         <Route path='/createPayment' element={<CreatePayment/>} />
       </Routes>
+      <ToastContainer />
     </Router>
   );
 }
