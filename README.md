@@ -1,6 +1,6 @@
 # Grad IQ – INY7314
 **Repository:** `insy7314-part2-gradiq`  
-**Tech Stack:**  MERN 
+**Tech Stack:**  MERN   
 **Author(s):** 
 - Jayden Larkins
 - Gerhard Lemmer
