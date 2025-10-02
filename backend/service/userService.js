@@ -12,30 +12,24 @@ const userCollection = db.collection('Users')
 
 async function loginUser(data) {
     try {
-        // Validate and sanitize all inputs
-        const accountNumber = validateAndSanitize('Account Number', data.accountNumber, VALIDATION_PATTERNS.ACCOUNTNUMBER);
-        const password = validateAndSanitize('Password', data.password, VALIDATION_PATTERNS.PASSWORD);
-        const username = validateAndSanitize('Username', data.username, VALIDATION_PATTERNS.USERNAME);
+        const { accountNumber, password, username } = data;
 
         if (!accountNumber || !password || !username) {
             throw new Error('All fields are required');
         }
 
-        // Find user by Username
-        const existingUser = await userCollection.findOne({ 
-            username: username 
-        });
+        // Validate and sanitize into new variables
+        const safeAccountNumber = validateAndSanitize('Account Number', accountNumber, VALIDATION_PATTERNS.ACCOUNTNUMBER);
+        const safePassword = validateAndSanitize('Password', password, VALIDATION_PATTERNS.PASSWORD);
+        const safeUsername = validateAndSanitize('Username', username, VALIDATION_PATTERNS.USERNAME);
 
-        if (!existingUser) {
-            throw new Error('Invalid credentials');
-        }
+        // Find user by sanitized username
+        const existingUser = await userCollection.findOne({ username: safeUsername });
+        if (!existingUser) throw new Error('Invalid credentials');
 
         // Compare password
-        const passwordMatch = await bcrypt.compare(password, existingUser.password);
-
-        if (!passwordMatch) {
-            throw new Error('Invalid credentials');
-        }
+        const passwordMatch = await bcrypt.compare(safePassword, existingUser.password);
+        if (!passwordMatch) throw new Error('Invalid credentials');
 
         // Generate JWT token
         const token = jwt.sign(
@@ -49,7 +43,7 @@ async function loginUser(data) {
             id: existingUser._id,
             username: existingUser.username,
             fullName: existingUser.fullName,
-            accountNumber: existingUser.accountNumber,
+            accountNumber: safeAccountNumber,
             token
         };
 
@@ -61,23 +55,26 @@ async function loginUser(data) {
 
 async function registerUser(data) {
     try {
-        // Validate and sanitize all inputs
-        const fullName = validateAndSanitize('Full Name', data.fullName, VALIDATION_PATTERNS.FULLNAME);
-        const idNumber = validateAndSanitize('ID Number', data.idNumber, VALIDATION_PATTERNS.IDNUMBER);
-        const accountNumber = validateAndSanitize('Account Number', data.accountNumber, VALIDATION_PATTERNS.ACCOUNTNUMBER);
-        const username = validateAndSanitize('Username', data.username, VALIDATION_PATTERNS.USERNAME);
-        const password = validateAndSanitize('Password', data.password, VALIDATION_PATTERNS.PASSWORD);
+        const { fullName, idNumber, accountNumber, username, password } = data;
 
-        if (!fullName || !idNumber || !accountNumber || !password || !username) {
+        // Check if any required field is missing
+        if (!fullName || !idNumber || !accountNumber || !username || !password) {
             throw new Error('All fields are required');
         }
+
+        // Validate and sanitize all inputs
+        const safeFullName = validateAndSanitize('Full Name', fullName, VALIDATION_PATTERNS.FULLNAME);
+        const safeIdNumber = validateAndSanitize('ID Number', idNumber, VALIDATION_PATTERNS.IDNUMBER);
+        const safeAccountNumber = validateAndSanitize('Account Number', accountNumber, VALIDATION_PATTERNS.ACCOUNTNUMBER);
+        const safeUsername = validateAndSanitize('Username', username, VALIDATION_PATTERNS.USERNAME);
+        const safePassword = validateAndSanitize('Password', password, VALIDATION_PATTERNS.PASSWORD);
 
         // Check if user already exists
         const existingUser = await userCollection.findOne({
             $or: [
-                { accountNumber: accountNumber },
-                { username: username },
-                { idNumber: idNumber }
+                { accountNumber: safeAccountNumber },
+                { username: safeUsername },
+                { idNumber: safeIdNumber }
             ]
         });
 
@@ -86,13 +83,13 @@ async function registerUser(data) {
         }
 
         // Hash password
-        const hashedPassword = await bcrypt.hash(password, salt);
+        const hashedPassword = await bcrypt.hash(safePassword, salt);
 
         const newUser = {
-            fullName,
-            idNumber,
-            accountNumber,
-            username,
+            fullName: safeFullName,
+            idNumber: safeIdNumber,
+            accountNumber: safeAccountNumber,
+            username: safeUsername,
             password: hashedPassword,
             createdAt: new Date()
         };
@@ -103,9 +100,9 @@ async function registerUser(data) {
 
         return {
             id: result.insertedId,
-            fullName,
-            username,
-            accountNumber,
+            fullName: safeFullName,
+            username: safeUsername,
+            accountNumber: safeAccountNumber,
             message: 'User registered successfully'
         };
 

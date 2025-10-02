@@ -3,6 +3,7 @@ const validator = require('validator');
 // Enhanced regex patterns for existing fields
 const VALIDATION_PATTERNS = {
     // User registration/login fields
+    // https://www.w3schools.com/jsref/jsref_obj_regexp.asp
     PASSWORD: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*#?&]).{10,25}$/,
     IDNUMBER: /^\d{13}$/,
     ACCOUNTNUMBER: /^[0-9]{8,12}$/,

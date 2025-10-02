@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../lib/axios";
+import { format } from "date-fns";
 
 export default function PastPayments() {
   const [payments, setPayments] = useState([]);
@@ -8,7 +9,7 @@ export default function PastPayments() {
   useEffect(() => {
     const fetchPayments = async () => {
       try {
-        const res = await api.get("/api/pastPayments", { withCredentials: true }); 
+        const res = await api.get("/api/pastPayments", { withCredentials: true });
         setPayments(res.data);
       } catch (err) {
         console.error(err);
@@ -19,20 +20,77 @@ export default function PastPayments() {
     fetchPayments();
   }, []);
 
+  //https://chatgpt.com/share/68de7c95-fdfc-8012-81e8-45958844e1dc
   return (
-    <div>
-      <h2>Payments</h2>
-      {error && <p>{error}</p>}
+    <div className="max-w-5xl mx-auto p-6">
+      <h2 className="text-3xl font-bold mb-6 text-[#007786] border-b-2 border-[#007786] pb-2">
+        Past Payments
+      </h2>
+
+      {error && (
+        <p className="text-red-500 mb-4 bg-red-100 p-3 rounded">{error}</p>
+      )}
+
       {payments.length === 0 ? (
-        <p>No payments found.</p>
+        <p className="text-gray-600">No payments found.</p>
       ) : (
-        <ul>
-          {payments.map((payment) => (
-            <li key={payment._id}>
-              Amount: {payment.amount} | Date: {payment.date}
-            </li>
+        <div className="grid gap-6">
+          {payments.map((payment, index) => (
+            <div
+              key={payment._id}
+              className={`bg-white border border-[#007786] rounded-lg shadow-md p-6 transform transition duration-500 ease-out
+                         opacity-0 translate-y-4`}
+              style={{ animation: `fadeInUp 0.5s ease-out forwards`, animationDelay: `${index * 0.1}s` }}
+            >
+              {/* Header with Amount and Status */}
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-bold text-[#007786]">
+                  Amount: {""}{payment.amount} {payment.currency}
+                </h3>
+                <span
+                  className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    payment.status === "pending"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : payment.status === "completed"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-gray-100 text-gray-800"
+                  }`}
+                >
+                  {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
+                </span>
+              </div>
+
+              {/* Grid for other details */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700">
+                <p>
+                  <span className="font-medium">Service Provider:</span>{" "}
+                  {payment.serviceProvider}
+                </p>
+                <p>
+                  <span className="font-medium">Created At:</span>{" "}
+                  {/*https://www.npmjs.com/package/date-fns */}
+                  {format(new Date(payment.createdAt), 'MMM dd, yyyy HH:mm a')}
+                </p>
+                <p>
+                  <span className="font-medium">Account Holder:</span>{" "}
+                  {payment.accountInformation.accountHolderName}
+                </p>
+                <p>
+                  <span className="font-medium">Account Type:</span>{" "}
+                  {payment.accountInformation.accountType.charAt(0).toUpperCase() + payment.accountInformation.accountType.slice(1)}
+                </p>
+                <p>
+                  <span className="font-medium">Branch Code:</span>{" "}
+                  {payment.accountInformation.branchCode}
+                </p>
+                <p>
+                  <span className="font-medium">SWIFT Code:</span>{" "}
+                  {payment.accountInformation.swiftCode}
+                </p>
+              </div>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );

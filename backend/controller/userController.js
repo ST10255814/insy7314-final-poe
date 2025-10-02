@@ -31,6 +31,7 @@ exports.loginUser = async (req, res) => {
         console.log(`Login Request received ${JSON.stringify(sanitizedBody, null, 2)}`);
         const user = await userService.loginUser(sanitizedBody);
         
+        //https://youtu.be/4TtAGhr61VI?si=8aM_p6UlWJawdRBf
         // Set secure HTTP-only cookie to prevent XSS
         res.cookie('authToken', user.token, {
             httpOnly: true,
