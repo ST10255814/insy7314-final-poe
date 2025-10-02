@@ -1,10 +1,15 @@
-import { useState } from 'react';
+import { useState } from "react";
 //https://reactrouter.com/api/components/NavLink
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from "react-router-dom";
 //https://www.npmjs.com/package/react-icons
-import { FaSignOutAlt, FaUserCircle, FaMoneyCheckAlt, FaHistory } from "react-icons/fa";
-import api from '../lib/axios';
-import { toast, Slide } from 'react-toastify'
+import {
+  FaSignOutAlt,
+  FaUserCircle,
+  FaMoneyCheckAlt,
+  FaHistory,
+} from "react-icons/fa";
+import api from "../lib/axios";
+import { toast, Slide } from "react-toastify";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -13,8 +18,8 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     try {
-      const res = await api.post('/api/logout', {}, { withCredentials: true });
-      toast.success(res.data.message || 'Logged out successfully', {
+      const res = await api.post("/api/logout", {}, { withCredentials: true });
+      toast.success(res.data.message || "Logged out successfully", {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -27,7 +32,7 @@ export default function Navbar() {
       localStorage.removeItem("user");
       navigate("/login");
     } catch (err) {
-      toast.success(err.response?.data?.error || 'Logout failed', {
+      toast.success(err.response?.data?.error || "Logout failed", {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -43,7 +48,8 @@ export default function Navbar() {
   const activeTextClass = "text-[#007786] font-semibold";
   const normalTextClass = "text-gray-700 hover:text-[#00a3b0]";
   const activeIconClass = "text-[#007786] animate-bounce-slow";
-  const normalIconClass = "text-gray-600 group-hover:text-[#00a3b0] transition duration-300";
+  const normalIconClass =
+    "text-gray-600 group-hover:text-[#00a3b0] transition duration-300";
 
   const getUnderlineClass = (path) =>
     window.location.pathname === path

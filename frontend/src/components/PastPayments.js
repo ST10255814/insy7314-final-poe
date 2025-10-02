@@ -9,7 +9,9 @@ export default function PastPayments() {
   useEffect(() => {
     const fetchPayments = async () => {
       try {
-        const res = await api.get("/api/pastPayments", { withCredentials: true });
+        const res = await api.get("/api/pastPayments", {
+          withCredentials: true,
+        });
         setPayments(res.data);
       } catch (err) {
         console.error(err);
@@ -39,12 +41,16 @@ export default function PastPayments() {
               key={payment._id}
               className={`bg-white border border-[#007786] rounded-lg shadow-md p-6 transform transition duration-500 ease-out
                          opacity-0 translate-y-4`}
-              style={{ animation: `fadeInUp 0.5s ease-out forwards`, animationDelay: `${index * 0.1}s` }}
+              style={{
+                animation: `fadeInUp 0.5s ease-out forwards`,
+                animationDelay: `${index * 0.1}s`,
+              }}
             >
               {/* Header with Amount and Status */}
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-bold text-[#007786]">
-                  Amount: {""}{payment.amount} {payment.currency}
+                  Amount: {""}
+                  {payment.amount} {payment.currency}
                 </h3>
                 <span
                   className={`px-3 py-1 rounded-full text-sm font-medium ${
@@ -55,7 +61,8 @@ export default function PastPayments() {
                       : "bg-gray-100 text-gray-800"
                   }`}
                 >
-                  {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
+                  {payment.status.charAt(0).toUpperCase() +
+                    payment.status.slice(1)}
                 </span>
               </div>
 
@@ -68,7 +75,7 @@ export default function PastPayments() {
                 <p>
                   <span className="font-medium">Made on:</span>{" "}
                   {/*https://www.npmjs.com/package/date-fns */}
-                  {format(new Date(payment.createdAt), 'MMM dd, yyyy HH:mm a')}
+                  {format(new Date(payment.createdAt), "MMM dd, yyyy HH:mm a")}
                 </p>
                 <p>
                   <span className="font-medium">Account Holder:</span>{" "}
@@ -76,7 +83,10 @@ export default function PastPayments() {
                 </p>
                 <p>
                   <span className="font-medium">Account Type:</span>{" "}
-                  {payment.accountInformation.accountType.charAt(0).toUpperCase() + payment.accountInformation.accountType.slice(1)}
+                  {payment.accountInformation.accountType
+                    .charAt(0)
+                    .toUpperCase() +
+                    payment.accountInformation.accountType.slice(1)}
                 </p>
                 <p>
                   <span className="font-medium">Branch Code:</span>{" "}

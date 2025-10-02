@@ -2,7 +2,7 @@ import { useState } from "react";
 import api from "../lib/axios";
 import { useNavigate } from "react-router-dom";
 import { FaUser, FaLock, FaIdCard } from "react-icons/fa";
-import { toast, Slide } from 'react-toastify';
+import { toast, Slide } from "react-toastify";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -28,7 +28,7 @@ export default function Login() {
       await new Promise((resolve) => setTimeout(resolve, 3000));
       localStorage.setItem("user", JSON.stringify(res.data.user.fullName));
       setLoading(false);
-      toast.success(res.data.message || 'Login Successful', {
+      toast.success(res.data.message || "Login Successful", {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -110,7 +110,9 @@ export default function Login() {
               className="w-full bg-[#007786] text-white py-2 rounded-lg font-semibold hover:bg-[#005f66] active:scale-95 transition duration-300 flex items-center justify-center space-x-2"
             >
               {loading ? (
-                <span className="animate-pulse cursor-not-allowed">Signing in...</span>
+                <span className="animate-pulse cursor-not-allowed">
+                  Signing in...
+                </span>
               ) : (
                 <span>Sign In</span>
               )}
