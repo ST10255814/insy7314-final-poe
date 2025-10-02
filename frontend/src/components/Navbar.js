@@ -48,8 +48,7 @@ export default function Navbar() {
   const activeTextClass = "text-[#007786] font-semibold";
   const normalTextClass = "text-gray-700 hover:text-[#00a3b0]";
   const activeIconClass = "text-[#007786] animate-bounce-slow";
-  const normalIconClass =
-    "text-gray-600 group-hover:text-[#00a3b0] transition duration-300";
+  const normalIconClass = "text-gray-600 group-hover:text-[#00a3b0] transition duration-300";
 
   const getUnderlineClass = (path) =>
     window.location.pathname === path
