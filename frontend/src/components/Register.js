@@ -143,7 +143,7 @@ export default function Register() {
               className="w-full bg-[#007786] text-white py-2 rounded-lg font-semibold hover:bg-[#005f66] active:scale-95 transition duration-300 flex items-center justify-center space-x-2"
             >
               {loading ? (
-                <span className="animate-pulse">Registering...</span>
+                <span className="animate-pulse cursor-not-allowed">Registering...</span>
               ) : (
                 <span>Register</span>
               )}
