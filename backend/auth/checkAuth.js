@@ -4,7 +4,7 @@ dotenv.config();
 
 const checkAuth = (req, res, next) => {
     try {
-        // Get token from HTTP-only cookie instead of Authorization header
+        // Get token from HTTP-only cookie 
         const token = req.cookies.authToken;
         
         if (!token) {

@@ -30,7 +30,9 @@ export default function CreatePayment() {
     e.preventDefault();
     setLoading(true);
     try {
+      await new Promise((resolve) => setTimeout(resolve, 3000));
       const res = await api.post("/api/createPayment", formData, { withCredentials: true });
+      await new Promise((resolve) => setTimeout(resolve, 3000));
       setMessage(`Payment created successfully! ID: ${res.data.id}`);
       setLoading(false);
     } catch (err) {
