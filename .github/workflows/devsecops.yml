@@ -1,0 +1,42 @@
+name: MERN DevSecOps CI
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-secure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint code
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test
+
+      - name: Run npm audit
+        run: npm audit --audit-level=high
+
+      - name: Run Semgrep SAST
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: "p/ci"
+
+      - name: Build Docker image
+        run: docker build -t my-mern-app:latest .
+
+      - name: Scan Docker image
+        run: trivy image my-mern-app:latest
+
+      - name: Push Docker image
+        run: docker push my-mern-app:latest
