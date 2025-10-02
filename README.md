@@ -1,4 +1,4 @@
-# Grad IQ – INY7314
+# Grad IQ – INY7314 Part 2
 **Repository:** `insy7314-part2-gradiq`  
 **Tech Stack:**  MERN   
 **Author(s):** 
