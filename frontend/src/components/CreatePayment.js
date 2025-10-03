@@ -1,8 +1,19 @@
 import React, { useState } from "react";
 import api from "../lib/axios";
 import { toast, Slide } from "react-toastify";
+import { z } from "zod";
 
 export default function CreatePayment() {
+  const paymentSchema = z.object({
+    amount: z.string(),
+    currency: z.string(),
+    serviceProvider: z.string(),
+    accountNumber: z.string().min(8).max(12),
+    branchCode: z.string().min(6).max(6),
+    accountType: z.string(),
+    accountHolderName: z.string().min(2).max(50),
+    swiftCode: z.string().min(8).max(11),
+  });
   const [formData, setFormData] = useState({
     amount: "",
     currency: "",
@@ -31,23 +42,53 @@ export default function CreatePayment() {
     setLoading(true);
     try {
       await new Promise((resolve) => setTimeout(resolve, 3000));
-      const res = await api.post("/api/createPayment", formData, {
-        withCredentials: true,
-      });
-      toast.success(
-        res.data.message || `Payment created successfully! ID: ${res.data.id}`,
-        {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          theme: "light",
-          transition: Slide,
-        }
-      );
-      setLoading(false);
+      const { success, error, data } = paymentSchema.safeParse(formData);
+      if (!success) {
+        error.issues.forEach((issue) => {
+          const field = issue.path[0];
+          toast.error(`${field}: ${issue.message}` || "Validation error", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "light",
+            transition: Slide,
+          });
+        });
+        setFormData({
+          amount: "",
+          currency: "",
+          serviceProvider: "",
+          accountNumber: "",
+          branchCode: "",
+          accountType: "",
+          accountHolderName: "",
+          swiftCode: "",
+        });
+        setLoading(false);
+        return;
+      } else {
+        const res = await api.post("/api/createPayment", data, {
+          withCredentials: true,
+        });
+        toast.success(
+          res.data.message ||
+            `Payment created successfully! ID: ${res.data.id}`,
+          {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "light",
+            transition: Slide,
+          }
+        );
+        setLoading(false);
+      }
     } catch (err) {
       toast.error(
         err.response?.data?.error ||
@@ -67,13 +108,11 @@ export default function CreatePayment() {
       setLoading(false);
     }
   };
-
   return (
     <div className="relative min-h-screen flex justify-center items-start px-4 pt-28 bg-gradient-to-br from-gray-50 via-[#d9f3f0] to-[#e6f7f5] overflow-hidden">
-      {/* Background blobs */}
+      {/* Background */}
       <div className="absolute top-0 left-0 w-72 h-72 bg-[#007768]/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#007768]/15 rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
-
       <div className="w-full max-w-md relative z-10 bg-white/90 backdrop-blur-md shadow-xl rounded-2xl border border-[#007786]/30 p-8">
         <h2 className="text-2xl font-bold text-[#007786] mb-6 text-center">
           Create Payment
@@ -111,7 +150,6 @@ export default function CreatePayment() {
               </select>
             </div>
           </div>
-
           {/* Service Provider */}
           <div className="flex flex-col">
             <label className="mb-1 font-semibold text-gray-700">
@@ -133,7 +171,6 @@ export default function CreatePayment() {
               <option value="African Bank">African Bank</option>
             </select>
           </div>
-
           {/* Account Information */}
           {showAccountInfo && (
             <div className="border-t border-gray-300 pt-6 space-y-4">
@@ -204,7 +241,6 @@ export default function CreatePayment() {
               </div>
             </div>
           )}
-
           {/* Submit Button */}
           <button
             type="submit"

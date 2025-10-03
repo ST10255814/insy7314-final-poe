@@ -7,7 +7,6 @@ export default function Home() {
       {/* Abstract Background Shapes */}
       <div className="absolute top-0 left-0 w-72 h-72 bg-[#007768]/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#007768]/15 rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
-
       {/* Hero Section */}
       <div className="z-10 text-center max-w-3xl">
         <h1 className="text-6xl md:text-7xl font-extrabold text-[#007768] mb-6 drop-shadow-md">
@@ -19,7 +18,6 @@ export default function Home() {
           track transactions, and manage your financial activity with ease.
         </p>
       </div>
-
       {/* Feature Highlights */}
       <div className="z-10 flex flex-col md:flex-row gap-6 mt-6">
         <div className="bg-white rounded-3xl shadow-lg p-8 w-72 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 text-center">
@@ -31,7 +29,6 @@ export default function Home() {
             Quickly create and process payments in just a few clicks.
           </p>
         </div>
-
         <div className="bg-white rounded-3xl shadow-lg p-8 w-72 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 text-center">
           <FaShieldAlt className="text-[#007768] text-5xl mb-4 mx-auto" />
           <h3 className="text-xl font-semibold text-gray-800 mb-2">
@@ -41,7 +38,6 @@ export default function Home() {
             Industry-standard security keeps your data safe at all times.
           </p>
         </div>
-
         <div className="bg-white rounded-3xl shadow-lg p-8 w-72 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 text-center">
           <FaChartLine className="text-[#007768] text-5xl mb-4 mx-auto" />
           <h3 className="text-xl font-semibold text-gray-800 mb-2">
@@ -52,7 +48,6 @@ export default function Home() {
           </p>
         </div>
       </div>
-
       {/* CTA Buttons */}
       <div className="z-10 mt-10 flex flex-wrap gap-4 justify-center">
         <Link

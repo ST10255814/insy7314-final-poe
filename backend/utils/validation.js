@@ -7,7 +7,7 @@ const VALIDATION_PATTERNS = {
     PASSWORD: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*#?&]).{10,25}$/,
     IDNUMBER: /^\d{13}$/,
     ACCOUNTNUMBER: /^[0-9]{8,12}$/,
-    USERNAME: /^[a-zA-Z][a-zA-Z0-9_]{2,15}$/,
+    USERNAME: /^[a-zA-Z][a-zA-Z0-9_]{4,15}$/,
     FULLNAME: /^[a-zA-Z\s]{2,50}$/,
     
     // Payment fields

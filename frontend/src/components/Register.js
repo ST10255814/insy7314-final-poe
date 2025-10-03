@@ -4,14 +4,17 @@ import api from "../lib/axios";
 import { FaUser, FaLock, FaIdCard } from "react-icons/fa";
 import { toast, Slide } from "react-toastify";
 import { z } from "zod";
+import { is } from "zod/v4/locales";
 
 export default function Register() {
   const navigate = useNavigate();
 
   const registerSchema = z.object({
     fullName: z.string(),
-    idNumber: z.string().min(13).max(13)
-
+    idNumber: z.string().min(13).max(13),
+    accountNumber: z.string().min(8).max(12),
+    username: z.string().min(4).max(15),
+    password: z.string().min(10).max(25),
   });
 
   const [formData, setFormData] = useState({
@@ -33,26 +36,46 @@ export default function Register() {
     try {
       //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise
       await new Promise((resolve) => setTimeout(resolve, 3000));
-      const res = await api.post("/api/register", formData);
-      toast.success(res.data.message || "User registered successfully!", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "light",
-        transition: Slide,
-      });
-      setFormData({
-        fullName: "",
-        idNumber: "",
-        accountNumber: "",
-        username: "",
-        password: "",
-      });
-      setLoading(false);
-      navigate("/login");
+      const { success, error, data } = registerSchema.safeParse(formData);
+      if (!success) {
+        error.issues.forEach((issue) => {
+          const field = issue.path[0];
+          toast.error(`${field}: ${issue.message}` || "Validation error", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "light",
+            transition: Slide,
+          });
+        });
+        setLoading(false);
+        return;
+      } else {
+        const res = await api.post("/api/register", data);
+
+        toast.success(res.data.message || "User registered successfully!", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "light",
+          transition: Slide,
+        });
+        setFormData({
+          fullName: "",
+          idNumber: "",
+          accountNumber: "",
+          username: "",
+          password: "",
+        });
+        setLoading(false);
+        navigate("/login");
+      }
     } catch (err) {
       toast.error(err.response?.data?.error || "Registration failed", {
         position: "top-right",

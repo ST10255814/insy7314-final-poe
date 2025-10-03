@@ -31,7 +31,9 @@ export default function PastPayments() {
           <p className="text-red-500 mb-6 bg-red-100 p-3 rounded">{error}</p>
         )}
         {payments.length === 0 ? (
-          <p className="text-gray-600 font-bold text-center py-10">No payments found.</p>
+          <p className="text-gray-600 font-bold text-center py-10">
+            No payments found.
+          </p>
         ) : (
           <div className="grid gap-6">
             {payments.map((payment, index) => (

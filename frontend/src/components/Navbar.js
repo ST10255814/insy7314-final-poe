@@ -18,6 +18,7 @@ export default function Navbar() {
   const handleLogout = async () => {
     try {
       const res = await api.post("/api/logout", {}, { withCredentials: true });
+
       toast.success(res.data.message || "Logged out successfully", {
         position: "top-right",
         autoClose: 3000,
@@ -88,7 +89,6 @@ export default function Navbar() {
               <span>Past Payments</span>
               <span className={getUnderlineClass("/pastPayments")}></span>
             </NavLink>
-
             <NavLink
               to="/createPayment"
               className={({ isActive }) =>
