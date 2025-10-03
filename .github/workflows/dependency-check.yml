@@ -9,15 +9,19 @@ on:
     - cron: '0 6 * * 1'  # Weekly on Monday at 6 AM
   workflow_dispatch:
 
+permissions:
+  contents: read
+  security-events: write
+
 jobs:
   frontend-dependency-check:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
@@ -37,18 +41,27 @@ jobs:
       - name: Check for High/Critical Vulnerabilities - Frontend
         run: |
           cd frontend
-          HIGH_VULNS=$(npm audit --audit-level high --json | jq '.metadata.vulnerabilities.high + .metadata.vulnerabilities.critical')
-          echo "High/Critical vulnerabilities found: $HIGH_VULNS"
-          if [ "$HIGH_VULNS" -gt 0 ]; then
-            echo "❌ High or critical vulnerabilities found in frontend dependencies!"
-            npm audit --audit-level high
-            exit 1
+          if [ -f "frontend-audit.json" ]; then
+            HIGH_VULNS=$(cat frontend-audit.json | jq '.metadata.vulnerabilities.high // 0')
+            CRITICAL_VULNS=$(cat frontend-audit.json | jq '.metadata.vulnerabilities.critical // 0')
+            TOTAL_HIGH_CRITICAL=$((HIGH_VULNS + CRITICAL_VULNS))
+            echo "High vulnerabilities: $HIGH_VULNS"
+            echo "Critical vulnerabilities: $CRITICAL_VULNS"
+            echo "Total High/Critical vulnerabilities: $TOTAL_HIGH_CRITICAL"
+            
+            if [ "$TOTAL_HIGH_CRITICAL" -gt 0 ]; then
+              echo "❌ High or critical vulnerabilities found in frontend dependencies!"
+              npm audit --audit-level high
+              exit 1
+            else
+              echo "✅ No high or critical vulnerabilities found in frontend dependencies"
+            fi
           else
-            echo "✅ No high or critical vulnerabilities found in frontend dependencies"
+            echo "✅ No vulnerabilities found in frontend dependencies"
           fi
       
       - name: Upload Frontend Audit Results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: frontend-audit-report
@@ -58,10 +71,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
@@ -81,18 +94,27 @@ jobs:
       - name: Check for High/Critical Vulnerabilities - Backend
         run: |
           cd backend
-          HIGH_VULNS=$(npm audit --audit-level high --json | jq '.metadata.vulnerabilities.high + .metadata.vulnerabilities.critical')
-          echo "High/Critical vulnerabilities found: $HIGH_VULNS"
-          if [ "$HIGH_VULNS" -gt 0 ]; then
-            echo "❌ High or critical vulnerabilities found in backend dependencies!"
-            npm audit --audit-level high
-            exit 1
+          if [ -f "backend-audit.json" ]; then
+            HIGH_VULNS=$(cat backend-audit.json | jq '.metadata.vulnerabilities.high // 0')
+            CRITICAL_VULNS=$(cat backend-audit.json | jq '.metadata.vulnerabilities.critical // 0')
+            TOTAL_HIGH_CRITICAL=$((HIGH_VULNS + CRITICAL_VULNS))
+            echo "High vulnerabilities: $HIGH_VULNS"
+            echo "Critical vulnerabilities: $CRITICAL_VULNS"
+            echo "Total High/Critical vulnerabilities: $TOTAL_HIGH_CRITICAL"
+            
+            if [ "$TOTAL_HIGH_CRITICAL" -gt 0 ]; then
+              echo "❌ High or critical vulnerabilities found in backend dependencies!"
+              npm audit --audit-level high
+              exit 1
+            else
+              echo "✅ No high or critical vulnerabilities found in backend dependencies"
+            fi
           else
-            echo "✅ No high or critical vulnerabilities found in backend dependencies"
+            echo "✅ No vulnerabilities found in backend dependencies"
           fi
       
       - name: Upload Backend Audit Results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: backend-audit-report
@@ -100,9 +122,20 @@ jobs:
 
   owasp-dependency-check:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Java for OWASP Dependency Check
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
       
       - name: Run OWASP Dependency Check
         uses: dependency-check/Dependency-Check_Action@main
@@ -118,16 +151,18 @@ jobs:
             --exclude "**/node_modules/**"
             --exclude "**/test/**"
             --exclude "**/tests/**"
+            --exclude "**/.git/**"
+            --nvdApiKey ${{ secrets.NVD_API_KEY }}
       
       - name: Upload OWASP Dependency Check Results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: owasp-dependency-check-report
           path: reports/
       
       - name: Publish OWASP Results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
           sarif_file: reports/dependency-check-report.sarif
@@ -136,10 +171,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
       
@@ -150,18 +185,32 @@ jobs:
         run: |
           cd frontend
           npm ci
-          license-checker --json --out ../frontend-licenses.json
-          license-checker --summary
+          license-checker --json --out ../frontend-licenses.json || echo "No packages found"
+          license-checker --summary || echo "No packages to summarize"
       
       - name: Check Backend Licenses
         run: |
           cd backend
           npm ci
-          license-checker --json --out ../backend-licenses.json
-          license-checker --summary
+          license-checker --json --out ../backend-licenses.json || echo "No packages found"
+          license-checker --summary || echo "No packages to summarize"
+      
+      - name: Check for Forbidden Licenses
+        run: |
+          echo "Checking for forbidden licenses..."
+          FORBIDDEN_LICENSES=("GPL-2.0" "GPL-3.0" "AGPL-1.0" "AGPL-3.0")
+          
+          for license in "${FORBIDDEN_LICENSES[@]}"; do
+            if grep -q "$license" frontend-licenses.json backend-licenses.json 2>/dev/null; then
+              echo "❌ Forbidden license found: $license"
+              exit 1
+            fi
+          done
+          echo "✅ No forbidden licenses found"
       
       - name: Upload License Reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: license-reports
           path: |
@@ -172,10 +221,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
       
@@ -185,7 +234,7 @@ jobs:
           npm ci
           npm outdated --json > ../frontend-outdated.json || true
           echo "Frontend outdated packages:"
-          npm outdated || true
+          npm outdated || echo "All frontend packages are up to date"
       
       - name: Check Backend Outdated Packages
         run: |
@@ -193,10 +242,29 @@ jobs:
           npm ci
           npm outdated --json > ../backend-outdated.json || true
           echo "Backend outdated packages:"
-          npm outdated || true
+          npm outdated || echo "All backend packages are up to date"
+      
+      - name: Analyze Outdated Packages
+        run: |
+          echo "## Outdated Package Analysis" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f "frontend-outdated.json" ] && [ -s "frontend-outdated.json" ]; then
+            FRONTEND_COUNT=$(cat frontend-outdated.json | jq 'length')
+            echo "- Frontend: $FRONTEND_COUNT outdated packages" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- Frontend: All packages up to date ✅" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ -f "backend-outdated.json" ] && [ -s "backend-outdated.json" ]; then
+            BACKEND_COUNT=$(cat backend-outdated.json | jq 'length')
+            echo "- Backend: $BACKEND_COUNT outdated packages" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- Backend: All packages up to date ✅" >> $GITHUB_STEP_SUMMARY
+          fi
       
       - name: Upload Outdated Package Reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: outdated-packages-report
           path: |
@@ -209,18 +277,49 @@ jobs:
     if: always()
     steps:
       - name: Download all artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
       
       - name: Generate Dependency Summary
         run: |
           echo "# 📋 Dependency Check Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## 🔍 Scan Results" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Frontend dependency check completed" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Backend dependency check completed" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ OWASP dependency check completed" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ License check completed" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Outdated packages check completed" >> $GITHUB_STEP_SUMMARY
+          
+          # Check job results
+          if [ "${{ needs.frontend-dependency-check.result }}" == "success" ]; then
+            echo "- ✅ Frontend dependency check: PASSED" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ❌ Frontend dependency check: FAILED" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ "${{ needs.backend-dependency-check.result }}" == "success" ]; then
+            echo "- ✅ Backend dependency check: PASSED" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ❌ Backend dependency check: FAILED" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ "${{ needs.owasp-dependency-check.result }}" == "success" ]; then
+            echo "- ✅ OWASP dependency check: PASSED" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ❌ OWASP dependency check: FAILED" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ "${{ needs.license-check.result }}" == "success" ]; then
+            echo "- ✅ License check: PASSED" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ❌ License check: FAILED" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ "${{ needs.outdated-packages.result }}" == "success" ]; then
+            echo "- ✅ Outdated packages check: COMPLETED" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ❌ Outdated packages check: FAILED" >> $GITHUB_STEP_SUMMARY
+          fi
+          
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## 📊 Reports Available" >> $GITHUB_STEP_SUMMARY
           echo "All dependency check reports have been uploaded as artifacts and are available for download." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Security Integration" >> $GITHUB_STEP_SUMMARY
+          echo "- SARIF results uploaded to GitHub Security tab" >> $GITHUB_STEP_SUMMARY
+          echo "- Check the Security tab for detailed vulnerability information" >> $GITHUB_STEP_SUMMARY

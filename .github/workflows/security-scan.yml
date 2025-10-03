@@ -4,35 +4,242 @@ on:
   schedule:
     - cron: '0 2 * * *'  # Daily at 2 AM
   workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  NODE_VERSION: '18'
 
 jobs:
   dependency-check:
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
       
       - name: Run OWASP Dependency Check
         uses: dependency-check/Dependency-Check_Action@main
+        id: dependency-check
         with:
-          project: 'payment-app'
+          project: 'insy7314-payment-app'
           path: '.'
           format: 'ALL'
+          args: >
+            --enableRetired
+            --enableExperimental
+            --failOnCVSS 7
+            --exclude "**/node_modules/**"
+            --exclude "**/test/**"
+            --exclude "**/tests/**"
+            --nvdApiKey ${{ secrets.NVD_API_KEY }}
+      
+      - name: Upload SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: reports/dependency-check-report.sarif
           
       - name: Upload Dependency Check Results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: dependency-check-report
           path: reports/
 
   code-scan:
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       
-      - name: Run CodeQL Analysis
-        uses: github/codeql-action/init@v2
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
         with:
           languages: javascript
+          config: |
+            name: "Security Analysis"
+            disable-default-queries: false
+            queries:
+              - uses: security-extended
+              - uses: security-and-quality
+          
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
           
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:javascript"
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+
+  npm-audit:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        directory: [frontend, backend]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ${{ matrix.directory }}/package-lock.json
+      
+      - name: Install Dependencies
+        run: |
+          cd ${{ matrix.directory }}
+          npm ci
+      
+      - name: Run NPM Audit
+        run: |
+          cd ${{ matrix.directory }}
+          npm audit --audit-level high --json > audit-results.json
+        continue-on-error: true
+      
+      - name: Check for Critical Vulnerabilities
+        run: |
+          cd ${{ matrix.directory }}
+          CRITICAL_VULNS=$(cat audit-results.json | jq '.metadata.vulnerabilities.critical // 0')
+          HIGH_VULNS=$(cat audit-results.json | jq '.metadata.vulnerabilities.high // 0')
+          echo "Critical vulnerabilities: $CRITICAL_VULNS"
+          echo "High vulnerabilities: $HIGH_VULNS"
+          
+          if [ "$CRITICAL_VULNS" -gt 0 ] || [ "$HIGH_VULNS" -gt 0 ]; then
+            echo "❌ Critical or high vulnerabilities found in ${{ matrix.directory }}!"
+            npm audit --audit-level high
+            exit 1
+          else
+            echo "✅ No critical or high vulnerabilities found in ${{ matrix.directory }}"
+          fi
+      
+      - name: Upload Audit Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: npm-audit-${{ matrix.directory }}
+          path: ${{ matrix.directory }}/audit-results.json
+
+  container-scan:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'schedule'
+    permissions:
+      security-events: write
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build Backend Image for Scanning
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile.backend
+          tags: payment-app-backend:latest
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      
+      - name: Build Frontend Image for Scanning
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile.frontend
+          tags: payment-app-frontend:latest
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      
+      - name: Run Trivy vulnerability scanner on Backend
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'payment-app-backend:latest'
+          format: 'sarif'
+          output: 'trivy-backend-results.sarif'
+          severity: 'CRITICAL,HIGH'
+      
+      - name: Run Trivy vulnerability scanner on Frontend
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'payment-app-frontend:latest'
+          format: 'sarif'
+          output: 'trivy-frontend-results.sarif'
+          severity: 'CRITICAL,HIGH'
+      
+      - name: Upload Trivy scan results for Backend
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-backend-results.sarif'
+          category: 'trivy-backend'
+      
+      - name: Upload Trivy scan results for Frontend
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-frontend-results.sarif'
+          category: 'trivy-frontend'
+
+  security-summary:
+    runs-on: ubuntu-latest
+    needs: [dependency-check, code-scan, secret-scan, npm-audit, container-scan]
+    if: always()
+    steps:
+      - name: Security Scan Summary
+        run: |
+          echo "# 🔒 Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Scan Results:" >> $GITHUB_STEP_SUMMARY
+          echo "- **OWASP Dependency Check**: ${{ needs.dependency-check.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **CodeQL Analysis**: ${{ needs.code-scan.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Secret Scanning**: ${{ needs.secret-scan.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **NPM Audit**: ${{ needs.npm-audit.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Container Scanning**: ${{ needs.container-scan.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "${{ needs.dependency-check.result }}" == "failure" ]] || 
+             [[ "${{ needs.code-scan.result }}" == "failure" ]] || 
+             [[ "${{ needs.secret-scan.result }}" == "failure" ]] || 
+             [[ "${{ needs.npm-audit.result }}" == "failure" ]] || 
+             [[ "${{ needs.container-scan.result }}" == "failure" ]]; then
+            echo "❌ **Security issues found!** Please review the scan results." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          else
+            echo "✅ **All security scans passed!**" >> $GITHUB_STEP_SUMMARY
+          fi
