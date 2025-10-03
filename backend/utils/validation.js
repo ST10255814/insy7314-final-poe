@@ -13,7 +13,7 @@ const VALIDATION_PATTERNS = {
     // Payment fields
     SWIFTCODE: /^[A-Za-z]{6}[A-Za-z0-9]{2}([A-Za-z0-9]{3})?$/,
     BRANCHCODE: /^[0-9]{6}$/,
-    ACCOUNTTYPE: /^(checking|savings|business)$/i,
+    ACCOUNTTYPE: /^(Checking|Savings|Business|Cheque)$/i,
     ACCOUNTHOLDERNAME: /^[a-zA-Z\s]{2,50}$/,
     SERVICEPROVIDER: /^[a-zA-Z0-9\s&.-]{2,50}$/,
     CURRENCY: /^(USD|EUR|GBP|ZAR)$/,
