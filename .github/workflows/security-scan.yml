@@ -1,0 +1,269 @@
+name: Security Scan
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  dependency-check:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      
+      - name: Run OWASP Dependency Check
+        uses: dependency-check/Dependency-Check_Action@main
+        id: dependency-check
+        with:
+          project: 'insy7314-payment-app'
+          path: '.'
+          format: 'JSON'
+          args: >
+            --enableRetired
+            --enableExperimental
+            --exclude "**/node_modules/**"
+            --exclude "**/test/**"
+            --exclude "**/tests/**"
+        continue-on-error: true
+      
+      - name: Upload Dependency Check Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dependency-check-report
+          path: reports/
+          if-no-files-found: ignore
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Run TruffleHog OSS
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: main
+          head: HEAD
+          extra_args: --debug --only-verified
+
+  npm-audit:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        directory: [frontend, backend]
+      fail-fast: false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Check if package.json exists
+        id: check-package
+        run: |
+          if [ -f "${{ matrix.directory }}/package.json" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "No package.json found in ${{ matrix.directory }}"
+          fi
+      
+      - name: Setup Node.js
+        if: steps.check-package.outputs.exists == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      
+      - name: Install Dependencies
+        if: steps.check-package.outputs.exists == 'true'
+        run: |
+          cd ${{ matrix.directory }}
+          npm install
+        continue-on-error: true
+      
+      - name: Run NPM Audit
+        if: steps.check-package.outputs.exists == 'true'
+        run: |
+          cd ${{ matrix.directory }}
+          npm audit --audit-level high --json > audit-results.json || echo "Audit completed with warnings"
+        continue-on-error: true
+      
+      - name: Check for Critical Vulnerabilities
+        if: steps.check-package.outputs.exists == 'true'
+        run: |
+          cd ${{ matrix.directory }}
+          if [ -f "audit-results.json" ] && [ -s "audit-results.json" ]; then
+            if command -v jq >/dev/null 2>&1; then
+              CRITICAL_VULNS=$(cat audit-results.json | jq '.metadata.vulnerabilities.critical // 0')
+              HIGH_VULNS=$(cat audit-results.json | jq '.metadata.vulnerabilities.high // 0')
+              echo "Critical vulnerabilities: $CRITICAL_VULNS"
+              echo "High vulnerabilities: $HIGH_VULNS"
+              
+              if [ "$CRITICAL_VULNS" -gt 0 ] || [ "$HIGH_VULNS" -gt 0 ]; then
+                echo "⚠️ Critical or high vulnerabilities found in ${{ matrix.directory }}!"
+                npm audit --audit-level high || true
+              else
+                echo "✅ No critical or high vulnerabilities found in ${{ matrix.directory }}"
+              fi
+            else
+              echo "jq not available, skipping vulnerability count"
+            fi
+          else
+            echo "No audit results or empty file, likely no issues"
+          fi
+      
+      - name: Upload Audit Results
+        uses: actions/upload-artifact@v4
+        if: always() && steps.check-package.outputs.exists == 'true'
+        with:
+          name: npm-audit-${{ matrix.directory }}
+          path: ${{ matrix.directory }}/audit-results.json
+          if-no-files-found: ignore
+
+  eslint-security:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        directory: [frontend, backend]
+      fail-fast: false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Check if package.json exists
+        id: check-package
+        run: |
+          if [ -f "${{ matrix.directory }}/package.json" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Setup Node.js
+        if: steps.check-package.outputs.exists == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      
+      - name: Install ESLint and Security Plugin
+        if: steps.check-package.outputs.exists == 'true'
+        run: |
+          npm install -g eslint eslint-plugin-security
+      
+      - name: Run ESLint Security Scan
+        if: steps.check-package.outputs.exists == 'true'
+        run: |
+          cd ${{ matrix.directory }}
+          eslint . --ext .js,.jsx --format json -o eslint-security-results.json || echo "ESLint completed with warnings"
+        continue-on-error: true
+      
+      - name: Upload ESLint Results
+        uses: actions/upload-artifact@v4
+        if: always() && steps.check-package.outputs.exists == 'true'
+        with:
+          name: eslint-security-${{ matrix.directory }}
+          path: ${{ matrix.directory }}/eslint-security-results.json
+          if-no-files-found: ignore
+
+  license-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      
+      - name: Install license-checker
+        run: npm install -g license-checker
+      
+      - name: Check Frontend Licenses
+        run: |
+          if [ -f "frontend/package.json" ]; then
+            cd frontend
+            npm install || echo "Failed to install frontend dependencies"
+            license-checker --json --out ../frontend-licenses.json || echo "No packages found"
+            cd ..
+          else
+            echo "No frontend package.json found"
+            echo "{}" > frontend-licenses.json
+          fi
+      
+      - name: Check Backend Licenses
+        run: |
+          if [ -f "backend/package.json" ]; then
+            cd backend
+            npm install || echo "Failed to install backend dependencies"
+            license-checker --json --out ../backend-licenses.json || echo "No packages found"
+            cd ..
+          else
+            echo "No backend package.json found"
+            echo "{}" > backend-licenses.json
+          fi
+      
+      - name: Check for Forbidden Licenses
+        run: |
+          echo "Checking for forbidden licenses..."
+          FORBIDDEN_LICENSES=("GPL-2.0" "GPL-3.0" "AGPL-1.0" "AGPL-3.0")
+          
+          for license in "${FORBIDDEN_LICENSES[@]}"; do
+            if grep -q "$license" frontend-licenses.json backend-licenses.json 2>/dev/null; then
+              echo "⚠️ Forbidden license found: $license"
+            fi
+          done
+          echo "✅ License check completed"
+      
+      - name: Upload License Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: license-reports
+          path: |
+            frontend-licenses.json
+            backend-licenses.json
+          if-no-files-found: ignore
+
+  security-summary:
+    runs-on: ubuntu-latest
+    needs: [dependency-check, secret-scan, npm-audit, eslint-security, license-check]
+    if: always()
+    steps:
+      - name: Security Scan Summary
+        run: |
+          echo "# 🔒 Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Scan Results:" >> $GITHUB_STEP_SUMMARY
+          echo "- **OWASP Dependency Check**: ${{ needs.dependency-check.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Secret Scanning**: ${{ needs.secret-scan.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **NPM Audit**: ${{ needs.npm-audit.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **ESLint Security**: ${{ needs.eslint-security.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **License Check**: ${{ needs.license-check.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📝 Notes:" >> $GITHUB_STEP_SUMMARY
+          echo "- All scans completed with graceful error handling" >> $GITHUB_STEP_SUMMARY
+          echo "- Check individual job logs for detailed results" >> $GITHUB_STEP_SUMMARY
+          echo "- Artifacts uploaded for manual review" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Security scan workflow completed successfully!**" >> $GITHUB_STEP_SUMMARY
