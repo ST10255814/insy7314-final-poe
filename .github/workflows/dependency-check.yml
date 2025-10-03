@@ -1,0 +1,226 @@
+name: Dependency Check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 6 * * 1'  # Weekly on Monday at 6 AM
+  workflow_dispatch:
+
+jobs:
+  frontend-dependency-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      - name: Install Frontend Dependencies
+        run: |
+          cd frontend
+          npm ci
+      
+      - name: Run Frontend Audit
+        run: |
+          cd frontend
+          npm audit --audit-level moderate --json > frontend-audit.json
+        continue-on-error: true
+      
+      - name: Check for High/Critical Vulnerabilities - Frontend
+        run: |
+          cd frontend
+          HIGH_VULNS=$(npm audit --audit-level high --json | jq '.metadata.vulnerabilities.high + .metadata.vulnerabilities.critical')
+          echo "High/Critical vulnerabilities found: $HIGH_VULNS"
+          if [ "$HIGH_VULNS" -gt 0 ]; then
+            echo "❌ High or critical vulnerabilities found in frontend dependencies!"
+            npm audit --audit-level high
+            exit 1
+          else
+            echo "✅ No high or critical vulnerabilities found in frontend dependencies"
+          fi
+      
+      - name: Upload Frontend Audit Results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: frontend-audit-report
+          path: frontend/frontend-audit.json
+
+  backend-dependency-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+      
+      - name: Install Backend Dependencies
+        run: |
+          cd backend
+          npm ci
+      
+      - name: Run Backend Audit
+        run: |
+          cd backend
+          npm audit --audit-level moderate --json > backend-audit.json
+        continue-on-error: true
+      
+      - name: Check for High/Critical Vulnerabilities - Backend
+        run: |
+          cd backend
+          HIGH_VULNS=$(npm audit --audit-level high --json | jq '.metadata.vulnerabilities.high + .metadata.vulnerabilities.critical')
+          echo "High/Critical vulnerabilities found: $HIGH_VULNS"
+          if [ "$HIGH_VULNS" -gt 0 ]; then
+            echo "❌ High or critical vulnerabilities found in backend dependencies!"
+            npm audit --audit-level high
+            exit 1
+          else
+            echo "✅ No high or critical vulnerabilities found in backend dependencies"
+          fi
+      
+      - name: Upload Backend Audit Results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: backend-audit-report
+          path: backend/backend-audit.json
+
+  owasp-dependency-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Run OWASP Dependency Check
+        uses: dependency-check/Dependency-Check_Action@main
+        id: dependency-check
+        with:
+          project: 'insy7314-payment-app'
+          path: '.'
+          format: 'ALL'
+          args: >
+            --enableRetired
+            --enableExperimental
+            --failOnCVSS 7
+            --exclude "**/node_modules/**"
+            --exclude "**/test/**"
+            --exclude "**/tests/**"
+      
+      - name: Upload OWASP Dependency Check Results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: owasp-dependency-check-report
+          path: reports/
+      
+      - name: Publish OWASP Results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: reports/dependency-check-report.sarif
+
+  license-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Install license-checker
+        run: npm install -g license-checker
+      
+      - name: Check Frontend Licenses
+        run: |
+          cd frontend
+          npm ci
+          license-checker --json --out ../frontend-licenses.json
+          license-checker --summary
+      
+      - name: Check Backend Licenses
+        run: |
+          cd backend
+          npm ci
+          license-checker --json --out ../backend-licenses.json
+          license-checker --summary
+      
+      - name: Upload License Reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: license-reports
+          path: |
+            frontend-licenses.json
+            backend-licenses.json
+
+  outdated-packages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Check Frontend Outdated Packages
+        run: |
+          cd frontend
+          npm ci
+          npm outdated --json > ../frontend-outdated.json || true
+          echo "Frontend outdated packages:"
+          npm outdated || true
+      
+      - name: Check Backend Outdated Packages
+        run: |
+          cd backend
+          npm ci
+          npm outdated --json > ../backend-outdated.json || true
+          echo "Backend outdated packages:"
+          npm outdated || true
+      
+      - name: Upload Outdated Package Reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: outdated-packages-report
+          path: |
+            frontend-outdated.json
+            backend-outdated.json
+
+  dependency-summary:
+    runs-on: ubuntu-latest
+    needs: [frontend-dependency-check, backend-dependency-check, owasp-dependency-check, license-check, outdated-packages]
+    if: always()
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+      
+      - name: Generate Dependency Summary
+        run: |
+          echo "# 📋 Dependency Check Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 🔍 Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Frontend dependency check completed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Backend dependency check completed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ OWASP dependency check completed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ License check completed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Outdated packages check completed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📊 Reports Available" >> $GITHUB_STEP_SUMMARY
+          echo "All dependency check reports have been uploaded as artifacts and are available for download." >> $GITHUB_STEP_SUMMARY
