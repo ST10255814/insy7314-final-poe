@@ -3,9 +3,17 @@ import api from "../lib/axios";
 import { useNavigate } from "react-router-dom";
 import { FaUser, FaLock, FaIdCard } from "react-icons/fa";
 import { toast, Slide } from "react-toastify";
+import { z } from "zod";
 
 export default function Login() {
   const navigate = useNavigate();
+
+  const loginSchema = z.object({
+    username: z.string().min(4),
+    accountNumber: z.string().min(8).max(12),
+    password: z.string().min(10).max(25),
+  });
+
   const [formData, setFormData] = useState({
     username: "",
     accountNumber: "",
@@ -20,23 +28,43 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     try {
-      //Promise to allow for a cleaner UI response
-      //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise
       await new Promise((resolve) => setTimeout(resolve, 3000));
-      const res = await api.post("/api/login", formData);
-      localStorage.setItem("user", JSON.stringify(res.data.user.fullName));
-      setLoading(false);
-      toast.success(res.data.message || "Login Successful", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "light",
-        transition: Slide,
-      });
-      navigate("/pastPayments");
+      const { success, error, safeData } = loginSchema.safeParse(formData);
+      if (!success) {
+        error.issues.forEach((issue) => {
+          const field = issue.path[0];
+          toast.error(`${field}: ${issue.message}` || "Validation error", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "light",
+            transition: Slide,
+          });
+        });
+        setLoading(false);
+        return;
+      } else {
+        //Promise to allow for a cleaner UI response
+        //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+        const res = await api.post("/api/login", safeData);
+        localStorage.setItem("user", JSON.stringify(res.data.user.fullName));
+        setLoading(false);
+        toast.success(res.data.message || "Login Successful", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "light",
+          transition: Slide,
+        });
+        navigate("/pastPayments");
+      }
     } catch (err) {
       //https://fkhadra.github.io/react-toastify/introduction
       toast.error(err.response?.data?.error || "Login failed", {

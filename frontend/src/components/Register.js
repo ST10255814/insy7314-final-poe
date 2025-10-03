@@ -3,9 +3,16 @@ import { useNavigate } from "react-router-dom";
 import api from "../lib/axios";
 import { FaUser, FaLock, FaIdCard } from "react-icons/fa";
 import { toast, Slide } from "react-toastify";
+import { z } from "zod";
 
 export default function Register() {
   const navigate = useNavigate();
+
+  const registerSchema = z.object({
+    fullName: z.string(),
+    idNumber: z.string().min()
+  });
+
   const [formData, setFormData] = useState({
     fullName: "",
     idNumber: "",
