@@ -10,7 +10,8 @@ export default function Register() {
 
   const registerSchema = z.object({
     fullName: z.string(),
-    idNumber: z.string().min()
+    idNumber: z.string().min(13).max(13)
+
   });
 
   const [formData, setFormData] = useState({
