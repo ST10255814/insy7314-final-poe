@@ -35,6 +35,7 @@ export default function Login() {
       if (!success) {
         error.issues.forEach((issue) => {
           const field = issue.path[0];
+          //https://fkhadra.github.io/react-toastify/introduction/
           toast.error(`${field}: ${issue.message}` || "Validation error", {
             position: "top-right",
             autoClose: 3000,
