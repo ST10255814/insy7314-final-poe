@@ -3,7 +3,8 @@ const validator = require('validator');
 // Enhanced regex patterns for existing fields
 const VALIDATION_PATTERNS = {
     // User registration/login fields
-    // https://www.w3schools.com/jsref/jsref_obj_regexp.asp
+    // W3Schools. 2025. JavaScript RegExp Patterns. W3Schools. [online] 
+    // Available at: <https://www.w3schools.com/jsref/jsref_obj_regexp.asp> [Accessed 1 October 2025].
     PASSWORD: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*#?&]).{10,25}$/,
     IDNUMBER: /^\d{13}$/,
     ACCOUNTNUMBER: /^[0-9]{8,12}$/,

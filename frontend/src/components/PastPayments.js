@@ -20,7 +20,8 @@ export default function PastPayments() {
     fetchPayments();
   }, []);
 
-  //https://chatgpt.com/share/68de7c95-fdfc-8012-81e8-45958844e1dc
+  // OpenAI. 2025. Please can you help me style the html to be aesthetically pleasing with the color 007786 using tailwind. [ChatGPT] 
+  // Available at: <https://chatgpt.com/share/68de7c95-fdfc-8012-81e8-45958844e1dc> [Accessed 1 October 2025].
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-[#d9f3f0] to-[#e6f7f5] pt-32 px-4 pb-12">
       <div className="max-w-5xl mx-auto">

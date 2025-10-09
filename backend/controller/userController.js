@@ -31,7 +31,8 @@ exports.loginUser = async (req, res) => {
         console.log(`Login Request received ${JSON.stringify(sanitizedBody, null, 2)}`);
         const user = await userService.loginUser(sanitizedBody);
         
-        //https://youtu.be/4TtAGhr61VI?si=8aM_p6UlWJawdRBf
+        // Dave Gray. 2022. MERN Stack Authentication with JWT Access, Refresh Tokens, Cookies. [video online]
+        // Available at: <https://youtu.be/4TtAGhr61VI?si=8aM_p6UlWJawdRBf> [Accessed 1 OCtober 2025]. 
         // Set secure HTTP-only cookie to prevent XSS
         res.cookie('authToken', user.token, {
             httpOnly: true,

@@ -1,7 +1,9 @@
 import { useState } from "react";
-//https://reactrouter.com/api/components/NavLink
+// ReactRouter. 2025. NavLink. React Router. [online]. Available at: 
+// <https://reactrouter.com/api/components/NavLink> [Accessed 1 October 2025].
 import { NavLink, useNavigate } from "react-router-dom";
-//https://www.npmjs.com/package/react-icons
+// NPM. 2025. react-icons. npmjs. [online]. Available at: 
+// <https://www.npmjs.com/package/react-icons> [Accessed 1 October 2025].
 import {
   FaSignOutAlt,
   FaUserCircle,

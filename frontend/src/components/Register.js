@@ -8,7 +8,8 @@ import { z } from "zod";
 export default function Register() {
   const navigate = useNavigate();
 
-  //https://youtu.be/U9PYyMhDc_k?si=qC9Y8InAB6jDJSqh
+  // Cosden Solutions. 2024. Zod Validation in React (Complete Tutorial). [video online] Available at:
+  // <https://youtu.be/U9PYyMhDc_k?si=qC9Y8InAB6jDJSqh> [Accessed 3 October 2025].
   const registerSchema = z.object({
     fullName: z.string(),
     idNumber: z.string().min(13).max(13),
@@ -34,7 +35,6 @@ export default function Register() {
     setLoading(true);
 
     try {
-      //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise
       await new Promise((resolve) => setTimeout(resolve, 3000));
       const { success, error, data } = registerSchema.safeParse(formData);
       if (!success) {
@@ -90,7 +90,8 @@ export default function Register() {
       setLoading(false);
     }
   };
-  //https://chatgpt.com/share/68de6f2b-24a4-8012-b840-43960854a6fc styling only
+  // OpenAI. 2025. Please can you help me style the register form the same way you did with the login form below. [ChatGPT] 
+  // Available at: <https://chatgpt.com/share/68de6f2b-24a4-8012-b840-43960854a6fc> [Accessed 1 October 2025].
   return (
     <div className="min-h-screen flex justify-center items-start relative overflow-hidden bg-gradient-to-br from-gray-50 via-[#d9f3f0] to-[#e6f7f5] pt-52 px-4">
       {/* Background */}

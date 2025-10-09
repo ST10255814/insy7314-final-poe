@@ -35,7 +35,8 @@ export default function Login() {
       if (!success) {
         error.issues.forEach((issue) => {
           const field = issue.path[0];
-          //https://fkhadra.github.io/react-toastify/introduction/
+          // Khadra, F. 2025. React-toastify. GitHub. [online] Available at: <https://fkhadra.github.io/react-toastify/introduction/>
+          // [Accessed 2 October 2025].
           toast.error(`${field}: ${issue.message}` || "Validation error", {
             position: "top-right",
             autoClose: 3000,
@@ -51,8 +52,9 @@ export default function Login() {
         setLoading(false);
         return;
       } else {
-        //Promise to allow for a cleaner UI response
-        //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise
+        // Promise to allow for a cleaner UI response
+        // Mozilla. 2025. Promise() constructor. Mozilla. [online] Available at: 
+        // <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise> [Accessed 2 October 2025].
         await new Promise((resolve) => setTimeout(resolve, 3000));
         const res = await api.post("/api/login", data);
         localStorage.setItem("user", JSON.stringify(res.data.user.fullName));
@@ -71,7 +73,6 @@ export default function Login() {
         navigate("/pastPayments");
       }
     } catch (err) {
-      //https://fkhadra.github.io/react-toastify/introduction
       toast.error(err.response?.data?.error || "Login failed", {
         position: "top-right",
         autoClose: 3000,
@@ -85,7 +86,9 @@ export default function Login() {
       setLoading(false);
     }
   };
-  //https://chatgpt.com/share/68de71ec-5710-8012-8bac-679bf1123dbc styling help
+  // OpenAI. 2025. Please can you help me only style this component with the color 007786 using tailwind. 
+  // I also want a animation for the button while its submitting and add icons within the input fields etc. [ChatGPT]
+  // Available at: <https://chatgpt.com/share/68de71ec-5710-8012-8bac-679bf1123dbc> [Accessed 1 October 2025].
   return (
     <div className="min-h-screen flex justify-center items-start relative overflow-hidden bg-gradient-to-br from-gray-50 via-[#d9f3f0] to-[#e6f7f5] pt-52 px-4">
       {/* Background Blobs */}
