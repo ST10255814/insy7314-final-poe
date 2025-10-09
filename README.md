@@ -67,5 +67,5 @@ React used along with axios and react-router-dom for efficient api calls and nav
 
 ---
 ## Demo Links  
-Backend API Code video walkthrough can be found [here](https://youtu.be/1fQPPgvUX4Q)  
-Frontend Video for our Payment gatewat can be found [here](https://youtu.be/DrvEL8eiAYk)  
+> Backend API Code video walkthrough can be found [here](https://youtu.be/1fQPPgvUX4Q)  
+> Frontend Video for our Payment gatewat can be found [here](https://youtu.be/DrvEL8eiAYk)  
