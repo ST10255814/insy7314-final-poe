@@ -4,11 +4,11 @@ import api from "../lib/axios";
 import { FaUser, FaLock, FaIdCard } from "react-icons/fa";
 import { toast, Slide } from "react-toastify";
 import { z } from "zod";
-import { is } from "zod/v4/locales";
 
 export default function Register() {
   const navigate = useNavigate();
 
+  //https://youtu.be/U9PYyMhDc_k?si=qC9Y8InAB6jDJSqh
   const registerSchema = z.object({
     fullName: z.string(),
     idNumber: z.string().min(13).max(13),
