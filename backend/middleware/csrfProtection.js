@@ -18,20 +18,29 @@ const generateCSRFToken = () => {
  * Sets CSRF token in both cookie and makes it available for headers
  */
 const setCSRFToken = (req, res, next) => {
-    const token = generateCSRFToken()
+    // Check if token already exists in cookie
+    let token = req.cookies['csrf-token']
     
-    // Set CSRF token in httpOnly cookie with SameSite=Strict
-    res.cookie('csrf-token', token, {
-        httpOnly: false, // Allow JS access for header inclusion
-        secure: process.env.NODE_ENV === 'production', // HTTPS only in production
-        sameSite: 'strict', // Strict CSRF protection
-        maxAge: 3600000, // 1 hour
-        path: '/'
-    })
+    // Generate new token if none exists or if it's expired
+    if (!token) {
+        token = generateCSRFToken()
+        
+        // Set CSRF token in cookie with SameSite=Strict
+        res.cookie('csrf-token', token, {
+            httpOnly: false, // Allow JS access for header inclusion
+            secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+            sameSite: 'strict', // Strict CSRF protection
+            maxAge: 3600000, // 1 hour
+            path: '/'
+        })
+    }
     
-    // Make token available for response (for initial page load)
+    // Make token available for response and request
     res.locals.csrfToken = token
     req.csrfToken = token
+    
+    // Add CSRF token to response headers for easy client access
+    res.setHeader('X-CSRF-Token', token)
     
     next()
 }
@@ -91,9 +100,25 @@ const validateCSRF = (req, res, next) => {
  * Endpoint to get CSRF token for AJAX requests
  */
 const getCSRFToken = (req, res) => {
+    // Generate a new token if one doesn't exist
+    let token = req.csrfToken || res.locals.csrfToken
+    
+    if (!token) {
+        token = generateCSRFToken()
+        
+        // Set CSRF token in cookie
+        res.cookie('csrf-token', token, {
+            httpOnly: false, // Allow JS access for header inclusion
+            secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+            sameSite: 'strict', // Strict CSRF protection
+            maxAge: 3600000, // 1 hour
+            path: '/'
+        })
+    }
+    
     res.json({
-        csrfToken: req.csrfToken,
-        message: 'CSRF token generated'
+        csrfToken: token,
+        message: 'CSRF token generated successfully'
     })
 }
 

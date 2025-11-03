@@ -58,7 +58,7 @@ app.use(cors({
         'X-CSRF-Token',
         'CSRF-Token'
     ], // Minimal required headers
-    exposedHeaders: [], // Don't expose any headers
+    exposedHeaders: ['X-CSRF-Token'], // Expose CSRF token header to client
     maxAge: 300, // Short cache time for preflight (5 minutes)
     optionsSuccessStatus: 204 // Better for legacy browsers
 }))
