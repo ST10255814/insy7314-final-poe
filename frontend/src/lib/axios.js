@@ -6,12 +6,6 @@ const api = axios.create({
     withCredentials: true
 })
 
-// Log all requests and responses and errors
-api.interceptors.request.use(request => {
-    console.log('Starting Request', request)
-    return request
-})
-
 api.interceptors.response.use(response => {
     console.log('Response:', response)
     return response
