@@ -28,8 +28,8 @@ const setCSRFToken = (req, res, next) => {
         
         // Set CSRF token in cookie with SameSite=Strict
         res.cookie('csrf-token', token, {
-            httpOnly: false, // Allow JS access for header inclusion
-            secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+            httpOnly: true, // Allow JS access for header inclusion
+            secure: process.env.NODE_ENV === 'production' , // HTTPS only in production
             sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax', // More permissive in development
             maxAge: 3600000, // 1 hour
             path: '/'
@@ -134,8 +134,8 @@ const getCSRFToken = (req, res) => {
         
         // Set CSRF token in cookie
         res.cookie('csrf-token', token, {
-            httpOnly: false, // Allow JS access for header inclusion
-            secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+            httpOnly: true, // Prevent JS access for security
+            secure: process.env.NODE_ENV === 'production' ? 'strict' : 'lax', // HTTPS only in production
             sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax', // More permissive in development
             maxAge: 3600000, // 1 hour
             path: '/'
