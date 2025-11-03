@@ -21,21 +21,9 @@ const api = axios.create({
     withCredentials: true
 })
 
-// Request interceptor to add CSRF token for state-changing requests
+// Log all requests and responses and errors
 api.interceptors.request.use(request => {
     console.log('Starting Request', request)
-    
-    // Add CSRF token for non-safe methods (POST, PUT, DELETE, PATCH)
-    if (['post', 'put', 'delete', 'patch'].includes(request.method.toLowerCase())) {
-        const csrfToken = getCSRFToken()
-        if (csrfToken) {
-            request.headers['X-CSRF-Token'] = csrfToken
-            console.log('CSRF Token added to request:', csrfToken)
-        } else {
-            console.warn('CSRF token not found in cookies')
-        }
-    }
-    
     return request
 })
 
