@@ -20,6 +20,15 @@ export default function Navbar() {
     try {
       const res = await api.post("/api/logout", {}, { withCredentials: true });
 
+      // Clear all client-side data
+      sessionStorage.clear();
+      localStorage.clear();
+      
+      // Clear document cookies manually (additional cleanup)
+      document.cookie.split(";").forEach(function(c) { 
+        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+      });
+
       toast.success(res.data.message || "Logged out successfully", {
         position: "top-right",
         autoClose: 3000,
@@ -30,9 +39,13 @@ export default function Navbar() {
         theme: "light",
         transition: Slide,
       });
-      sessionStorage.removeItem("user");
+      
       navigate("/login");
     } catch (err) {
+      // Even if logout request fails, clear local data
+      sessionStorage.clear();
+      localStorage.clear();
+      
       toast.error(err.response?.data?.error || "Logout failed", {
         position: "top-right",
         autoClose: 3000,
@@ -43,6 +56,8 @@ export default function Navbar() {
         theme: "light",
         transition: Slide,
       });
+      
+      navigate("/login");
     }
   };
 

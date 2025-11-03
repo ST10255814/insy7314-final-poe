@@ -70,12 +70,23 @@ api.interceptors.response.use(response => {
     return response
 }, error => {
     console.log('Error Response:', error.response)
-    //Handle 401 errors globally
+    
+    // Handle 401 errors globally
     if (error.response && error.response.status === 401) {
-        // Optionally, you can redirect to login page or perform other actions
+        // Clear all tokens and redirect to login
+        sessionStorage.clear()
+        localStorage.clear()
         console.log('Unauthorized! Redirecting to login...')
-        window.location.href = '/login';
+        window.location.href = '/login'
     }
+    
+    // Handle CSRF token errors - clear tokens and retry could be implemented here
+    if (error.response && error.response.status === 403 && 
+        error.response.data && error.response.data.error && 
+        error.response.data.error.includes('CSRF')) {
+        console.log('CSRF error detected - may need fresh token on next request')
+    }
+    
     return Promise.reject(error)
 })
 

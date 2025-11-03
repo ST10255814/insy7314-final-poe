@@ -65,8 +65,16 @@ exports.logoutUser = async (_, res) => {
             path: '/'
         });
         
-        res.status(200).json({ message: 'Logout successful' });
-        console.log('User logged out successfully');
+        // Clear the CSRF token cookie
+        res.clearCookie('csrf-token', {
+            httpOnly: false,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+            path: '/'
+        });
+        
+        res.status(200).json({ message: 'Logout successful - all tokens cleared' });
+        console.log('User logged out successfully - all tokens cleared');
     } catch (error) {
         console.error(`Logout error: ${error.message}`);
         res.status(500).json({ error: 'Logout failed' });
