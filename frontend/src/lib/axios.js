@@ -17,6 +17,12 @@ api.interceptors.response.use(response => {
     return response
 }, error => {
     console.log('Error Response:', error.response)
+    //Handle 401 errors globally
+    if (error.response && error.response.status === 401) {
+        // Optionally, you can redirect to login page or perform other actions
+        console.log('Unauthorized! Redirecting to login...')
+        window.location.href = '/login';
+    }
     return Promise.reject(error)
 })
 
