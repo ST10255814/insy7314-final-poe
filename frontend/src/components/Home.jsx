@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { FaCreditCard, FaShieldAlt, FaChartLine } from "react-icons/fa";
 
 export default function Home() {
+  const user = JSON.parse(sessionStorage.getItem("user"));
   return (
     <div className="relative h-screen flex flex-col items-center justify-center px-6 bg-gradient-to-br from-gray-50 via-[#d9f3f0] to-[#e6f7f5] overflow-hidden">
       {/* Abstract Background Shapes */}
@@ -49,19 +50,31 @@ export default function Home() {
         </div>
       </div>
       {/* CTA Buttons */}
+      {user ? null : (
       <div className="z-10 mt-10 flex flex-wrap gap-4 justify-center">
         <Link
           to="/register"
           className="bg-[#007768] text-white font-semibold px-10 py-4 rounded-full shadow-lg hover:bg-[#005f57] hover:shadow-2xl transition transform hover:scale-105"
-        >
+        > 
           Get Started
         </Link>
         <Link
           to="/login"
-          className="bg-white border border-gray-300 text-gray-700 font-semibold px-10 py-4 rounded-full shadow-lg hover:bg-gray-100 hover:shadow-xl transition transform hover:scale-105"
+          className="bg-white text-[#007768] font-semibold px-10 py-4 rounded-full shadow-lg border border-[#007768] hover:bg-gray-100 hover:shadow-2xl transition transform hover:scale-105"
         >
-          Login
+          Log In
         </Link>
+      </div>
+      )}
+      <div className="z-10 mt-10 flex flex-wrap gap-4 justify-center">
+        {user ? (
+          <Link
+            to="/dashboard"
+            className="bg-[#007768] text-white font-semibold px-10 py-4 rounded-full shadow-lg hover:bg-[#005f57] hover:shadow-2xl transition transform hover:scale-105"
+          >
+            Go to Dashboard
+          </Link>
+        ) : null}
       </div>
     </div>
   );

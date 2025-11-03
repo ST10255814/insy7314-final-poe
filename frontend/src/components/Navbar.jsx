@@ -1,4 +1,3 @@
-import { useState } from "react";
 // ReactRouter. 2025. NavLink. React Router. [online]. Available at: 
 // <https://reactrouter.com/api/components/NavLink> [Accessed 1 October 2025].
 import { NavLink, useNavigate } from "react-router-dom";
@@ -15,7 +14,7 @@ import { toast, Slide } from "react-toastify";
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = JSON.parse(sessionStorage.getItem("user"));
 
   const handleLogout = async () => {
     try {
@@ -31,7 +30,7 @@ export default function Navbar() {
         theme: "light",
         transition: Slide,
       });
-      localStorage.removeItem("user");
+      sessionStorage.removeItem("user");
       navigate("/login");
     } catch (err) {
       toast.error(err.response?.data?.error || "Logout failed", {

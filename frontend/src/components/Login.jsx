@@ -57,7 +57,7 @@ export default function Login() {
         // <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise> [Accessed 2 October 2025].
         await new Promise((resolve) => setTimeout(resolve, 3000));
         const res = await api.post("/api/login", data);
-        localStorage.setItem("user", JSON.stringify(res.data.user.fullName));
+        sessionStorage.setItem("user", JSON.stringify(res.data.user.fullName));
 
         setLoading(false);
         toast.success(res.data.message || "Login Successful", {
