@@ -32,8 +32,12 @@ app.use(cors({
         // Whitelist of allowed origins
         const allowedOrigins = [
             process.env.FRONTEND_URL || 'https://localhost:3000',
-            'https://localhost:3001' // Only for development
+            'https://localhost:3001', // Only for development
+            'http://localhost:3000', // Allow HTTP for development
+            'http://localhost:3001'  // Allow HTTP for development
         ]
+        
+        console.log('CORS check - Origin:', origin, 'Allowed origins:', allowedOrigins)
         
         // In production, be stricter
         if (process.env.NODE_ENV === 'production') {
@@ -44,6 +48,7 @@ app.use(cors({
             // Development: still validate but allow localhost variations
             if (origin && !allowedOrigins.includes(origin) && 
                 !origin.match(/^https?:\/\/(localhost|127\.0\.0\.1):(3000|3001)$/)) {
+                console.log('CORS blocked origin:', origin)
                 return callback(new Error('Blocked by CORS policy'), false)
             }
         }

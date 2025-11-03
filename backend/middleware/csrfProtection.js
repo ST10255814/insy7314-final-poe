@@ -30,7 +30,7 @@ const setCSRFToken = (req, res, next) => {
         res.cookie('csrf-token', token, {
             httpOnly: false, // Allow JS access for header inclusion
             secure: process.env.NODE_ENV === 'production', // HTTPS only in production
-            sameSite: 'strict', // Strict CSRF protection
+            sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax', // More permissive in development
             maxAge: 3600000, // 1 hour
             path: '/'
         })
@@ -136,7 +136,7 @@ const getCSRFToken = (req, res) => {
         res.cookie('csrf-token', token, {
             httpOnly: false, // Allow JS access for header inclusion
             secure: process.env.NODE_ENV === 'production', // HTTPS only in production
-            sameSite: 'strict', // Strict CSRF protection
+            sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax', // More permissive in development
             maxAge: 3600000, // 1 hour
             path: '/'
         })

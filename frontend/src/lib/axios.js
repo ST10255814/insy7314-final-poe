@@ -15,15 +15,48 @@ const getCSRFToken = () => {
     return null
 }
 
+// Function to ensure CSRF token is available
+const ensureCSRFToken = async () => {
+    let token = getCSRFToken()
+    if (!token) {
+        console.log('No CSRF token found, fetching...')
+        try {
+            const response = await axios.get('https://127.0.0.1:5000/api/csrf-token', {
+                withCredentials: true
+            })
+            console.log('CSRF token fetched:', response.data.csrfToken)
+            // Wait a bit for cookie to be set
+            await new Promise(resolve => setTimeout(resolve, 100))
+            token = getCSRFToken()
+        } catch (error) {
+            console.error('Failed to fetch CSRF token:', error)
+        }
+    }
+    return token
+}
+
 const api = axios.create({
     baseURL: 'https://127.0.0.1:5000',
     headers: {'Content-Type': 'application/json'},
     withCredentials: true
 })
 
-// Log all requests and responses and errors
-api.interceptors.request.use(request => {
+// Request interceptor to add CSRF token for state-changing requests
+api.interceptors.request.use(async (request) => {
     console.log('Starting Request', request)
+    
+    // Add CSRF token for non-safe methods (POST, PUT, DELETE, PATCH)
+    if (['post', 'put', 'delete', 'patch'].includes(request.method.toLowerCase())) {
+        const csrfToken = await ensureCSRFToken()
+        if (csrfToken) {
+            request.headers['X-CSRF-Token'] = csrfToken
+            console.log('CSRF Token added to request:', csrfToken.substring(0, 8) + '...')
+        } else {
+            console.warn('CSRF token not found in cookies')
+            console.log('Available cookies:', document.cookie)
+        }
+    }
+    
     return request
 })
 
