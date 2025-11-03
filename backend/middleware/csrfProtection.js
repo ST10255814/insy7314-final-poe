@@ -135,7 +135,7 @@ const getCSRFToken = (req, res) => {
         // Set CSRF token in cookie
         res.cookie('csrf-token', token, {
             httpOnly: true, // Prevent JS access for security
-            secure: process.env.NODE_ENV === 'production' ? 'strict' : 'lax', // HTTPS only in production
+            secure: process.env.NODE_ENV === 'production', // HTTPS only in production
             sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax', // More permissive in development
             maxAge: 3600000, // 1 hour
             path: '/'
