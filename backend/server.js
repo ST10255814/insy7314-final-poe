@@ -90,11 +90,8 @@ const httpsServer = https.createServer({
 // Create HTTP server for redirection
 const httpApp = express()
 
-// Apply HTTPS redirect middleware to HTTP server
-httpApp.use(redirectToHTTPS)
-
-// Fallback redirect for direct HTTP requests
-httpApp.all('*', (req, res) => {
+// Apply HTTPS redirect middleware to HTTP server - this handles all routes
+httpApp.use((req, res) => {
     const httpsUrl = `https://${req.header('host') || 'localhost'}:${PORT}${req.url}`
     res.redirect(301, httpsUrl)
 })
