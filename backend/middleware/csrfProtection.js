@@ -24,6 +24,7 @@ const setCSRFToken = (req, res, next) => {
     // Generate new token if none exists or if it's expired
     if (!token) {
         token = generateCSRFToken()
+        console.log('Generated new CSRF token:', token.substring(0, 8) + '...')
         
         // Set CSRF token in cookie with SameSite=Strict
         res.cookie('csrf-token', token, {
@@ -33,6 +34,8 @@ const setCSRFToken = (req, res, next) => {
             maxAge: 3600000, // 1 hour
             path: '/'
         })
+    } else {
+        console.log('Using existing CSRF token:', token.substring(0, 8) + '...')
     }
     
     // Make token available for response and request
@@ -59,8 +62,16 @@ const validateCSRF = (req, res, next) => {
     const headerToken = req.headers['x-csrf-token'] || req.headers['csrf-token']
     const bodyToken = req.body._csrf
     
+    console.log('CSRF Validation:', {
+        method: req.method,
+        cookieToken: cookieToken ? 'present' : 'missing',
+        headerToken: headerToken ? 'present' : 'missing',
+        bodyToken: bodyToken ? 'present' : 'missing'
+    })
+    
     // Check if tokens exist
     if (!cookieToken) {
+        console.log('CSRF validation failed: No cookie token')
         return res.status(403).json({
             error: 'CSRF token missing',
             message: 'CSRF token not found in cookies'
@@ -71,28 +82,43 @@ const validateCSRF = (req, res, next) => {
     const submittedToken = headerToken || bodyToken
     
     if (!submittedToken) {
+        console.log('CSRF validation failed: No submitted token')
         return res.status(403).json({
             error: 'CSRF token missing',
             message: 'CSRF token not found in headers or body'
         })
     }
     
-    // Validate double-submit pattern
+    // Validate double-submit pattern - simple string comparison first
     if (cookieToken !== submittedToken) {
+        console.log('CSRF validation failed: Token mismatch')
         return res.status(403).json({
             error: 'CSRF token mismatch',
             message: 'CSRF tokens do not match'
         })
     }
     
-    // Additional timing-safe comparison
-    if (!crypto.timingSafeEqual(Buffer.from(cookieToken), Buffer.from(submittedToken))) {
-        return res.status(403).json({
-            error: 'CSRF token invalid',
-            message: 'CSRF token validation failed'
-        })
+    // Additional timing-safe comparison for extra security
+    try {
+        if (!crypto.timingSafeEqual(Buffer.from(cookieToken), Buffer.from(submittedToken))) {
+            console.log('CSRF validation failed: Timing-safe comparison failed')
+            return res.status(403).json({
+                error: 'CSRF token invalid',
+                message: 'CSRF token validation failed'
+            })
+        }
+    } catch (error) {
+        console.log('CSRF timing-safe comparison error:', error.message)
+        // Fall back to regular comparison if timing-safe fails
+        if (cookieToken !== submittedToken) {
+            return res.status(403).json({
+                error: 'CSRF token invalid',
+                message: 'CSRF token validation failed'
+            })
+        }
     }
     
+    console.log('CSRF validation successful')
     next()
 }
 

@@ -1,14 +1,41 @@
 import axios from "axios"
 
+// Helper function to get CSRF token from cookies
+const getCSRFToken = () => {
+    const name = 'csrf-token='
+    const decodedCookie = decodeURIComponent(document.cookie)
+    const cookieArray = decodedCookie.split(';')
+    
+    for (let i = 0; i < cookieArray.length; i++) {
+        let cookie = cookieArray[i].trim()
+        if (cookie.indexOf(name) === 0) {
+            return cookie.substring(name.length, cookie.length)
+        }
+    }
+    return null
+}
+
 const api = axios.create({
     baseURL: 'https://127.0.0.1:5000',
     headers: {'Content-Type': 'application/json'},
     withCredentials: true
 })
 
-// Log all requests and responses and errors
+// Request interceptor to add CSRF token for state-changing requests
 api.interceptors.request.use(request => {
     console.log('Starting Request', request)
+    
+    // Add CSRF token for non-safe methods (POST, PUT, DELETE, PATCH)
+    if (['post', 'put', 'delete', 'patch'].includes(request.method.toLowerCase())) {
+        const csrfToken = getCSRFToken()
+        if (csrfToken) {
+            request.headers['X-CSRF-Token'] = csrfToken
+            console.log('CSRF Token added to request:', csrfToken)
+        } else {
+            console.warn('CSRF token not found in cookies')
+        }
+    }
+    
     return request
 })
 
