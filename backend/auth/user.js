@@ -2,6 +2,7 @@ const express = require('express')
 const rateLimiter = require('../middleware/rateLimiter')
 const { checkAuth } = require('./checkAuth')
 const { securityHeaders, requireHTTPS } = require('../middleware/security')
+const { validateCSRF } = require('../middleware/csrfProtection')
 
 const router = express.Router()
 
@@ -12,12 +13,12 @@ const paymentController = require('../controller/paymentController')
 // Apply security headers to all routes
 router.use(securityHeaders)
 
-//Login endpoint - require HTTPS for authentication
-router.post('/api/login', requireHTTPS, rateLimiter.userLimiter, userController.loginUser)
-router.post('/api/register', requireHTTPS, rateLimiter.userLimiter, userController.registerUser)
-router.post('/api/logout', userController.logoutUser)
+//Login endpoint - require HTTPS and CSRF for authentication
+router.post('/api/login', requireHTTPS, validateCSRF, rateLimiter.userLimiter, userController.loginUser)
+router.post('/api/register', requireHTTPS, validateCSRF, rateLimiter.userLimiter, userController.registerUser)
+router.post('/api/logout', validateCSRF, userController.logoutUser)
 
-//Payment endpoints - require HTTPS for financial operations
+//Payment endpoints - require HTTPS and CSRF for financial operations
 router.get('/api/pastPayments', requireHTTPS, checkAuth, paymentController.getAllPayments)
-router.post('/api/createPayment', requireHTTPS, checkAuth, paymentController.CreatePayment)
+router.post('/api/createPayment', requireHTTPS, validateCSRF, checkAuth, paymentController.CreatePayment)
 module.exports = router

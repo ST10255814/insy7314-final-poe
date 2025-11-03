@@ -9,6 +9,8 @@ const cookieParser = require('cookie-parser')
 
 const { connectMongo } = require('./database/db')
 const userRoutes = require('./auth/user')
+const { setCSRFToken, getCSRFToken } = require('./middleware/csrfProtection')
+const { apiCSP } = require('./middleware/strictCSP')
 
 const PORT = process.env.PORT || 5000
 const HTTP_PORT = process.env.HTTP_PORT || 8080
@@ -21,49 +23,49 @@ const redirectToHTTPS = (req, res, next) => {
     next()
 }
 
-app.use(express.json())
+app.use(express.json({ limit: '10mb' }))
 app.use(cookieParser()) // Parse cookies from requests
 
-// Enhanced CORS configuration
+// Strict CORS configuration - lock down to specific origins, methods, and headers
 app.use(cors({
     origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
-        
+        // Whitelist of allowed origins
         const allowedOrigins = [
             process.env.FRONTEND_URL || 'https://localhost:3000',
-            'https://localhost:3001', // Additional allowed origins
-            'https://127.0.0.1:3000'
-        ];
+            'https://localhost:3001' // Only for development
+        ]
         
-        if (allowedOrigins.includes(origin)) {
-            return callback(null, true);
+        // In production, be stricter
+        if (process.env.NODE_ENV === 'production') {
+            if (!origin || !allowedOrigins.includes(origin)) {
+                return callback(new Error('Blocked by CORS policy'), false)
+            }
+        } else {
+            // Development: still validate but allow localhost variations
+            if (origin && !allowedOrigins.includes(origin) && 
+                !origin.match(/^https?:\/\/(localhost|127\.0\.0\.1):(3000|3001)$/)) {
+                return callback(new Error('Blocked by CORS policy'), false)
+            }
         }
         
-        return callback(new Error('Not allowed by CORS'));
+        callback(null, true)
     },
-    credentials: true, // Allow cookies to be sent with requests
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-    exposedHeaders: ['X-Total-Count'], // Headers exposed to the client
-    maxAge: 86400 // Cache preflight response for 24 hours
+    credentials: true, // Required for CSRF cookies
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Only allow necessary methods
+    allowedHeaders: [
+        'Content-Type',
+        'Authorization',
+        'X-CSRF-Token',
+        'CSRF-Token'
+    ], // Minimal required headers
+    exposedHeaders: [], // Don't expose any headers
+    maxAge: 300, // Short cache time for preflight (5 minutes)
+    optionsSuccessStatus: 204 // Better for legacy browsers
 }))
 
 // Enhanced Helmet configuration
 app.use(helmet({
-    contentSecurityPolicy: {
-        directives: {
-            defaultSrc: ["'self'"],
-            styleSrc: ["'self'", "'unsafe-inline'"],
-            scriptSrc: ["'self'"],
-            imgSrc: ["'self'", "data:", "https:"],
-            connectSrc: ["'self'"],
-            fontSrc: ["'self'"],
-            objectSrc: ["'none'"],
-            mediaSrc: ["'self'"],
-            frameSrc: ["'none'"],
-        },
-    },
+    contentSecurityPolicy: false, // We'll use our custom strict CSP
     crossOriginEmbedderPolicy: false, // Disable for API compatibility
     hsts: {
         maxAge: 63072000, // 2 years (recommended by OWASP)
@@ -80,6 +82,15 @@ app.use(helmet({
     dnsPrefetchControl: { allow: false }, // Control DNS prefetching
     permittedCrossDomainPolicies: false // Restrict Flash and PDF cross-domain policies
 }))
+
+// Apply our strict CSP for API endpoints
+app.use(apiCSP)
+
+// CSRF Token Generation - must be before routes
+app.use(setCSRFToken)
+
+// CSRF token endpoint
+app.get('/api/csrf-token', getCSRFToken)
 
 //Configure https for SSL traffic encryption
 const httpsServer = https.createServer({
