@@ -1,6 +1,7 @@
 const { client } = require('../database/db');
 const { ObjectId } = require('mongodb');
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const { validateAndSanitize, validateAmount, VALIDATION_PATTERNS } = require('../utils/validation');
 
 function toObjectId(id) {
@@ -178,7 +179,7 @@ async function submitToSwift(paymentId, employee) {
           status: 'submitted to Swift',
           verifiedAt: new Date(),
           verifiedBy: employee.username,
-          swiftTransactionId: `SWIFT${Date.now()}${Math.floor(Math.random() * 1000)}`
+          swiftTransactionId: `SWIFT${Date.now()}${crypto.randomBytes(2).toString('hex')}`
         }
       }
     );
