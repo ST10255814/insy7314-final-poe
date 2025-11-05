@@ -1,0 +1,29 @@
+# Snyk configuration file
+
+# Test settings
+test: backend frontend
+
+# Language settings  
+language-settings:
+  javascript:
+    packageManager: npm
+
+# Severity threshold
+severity-threshold: medium
+
+# Ignore settings (add specific vulnerabilities to ignore if needed)
+ignore:
+  # Example: ignore specific vulnerability for a period
+  # SNYK-JS-LODASH-567746:
+  #   - '*':
+  #       reason: 'No fix available yet and low impact in our use case'
+  #       expires: '2024-12-31T23:59:59.999Z'
+
+# Patches (if available)
+patches: {}
+
+# Monitor settings for continuous monitoring
+monitor: true
+
+# Organization (replace with your Snyk organization)
+org: vcstdn2024

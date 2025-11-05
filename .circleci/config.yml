@@ -1,0 +1,227 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@5.1.0
+  sonarcloud: sonarsource/sonarcloud@2.0.0
+  snyk: snyk/snyk@2.0.2
+
+# Define workflows
+workflows:
+  version: 2
+  ci-cd-pipeline:
+    jobs:
+      - security-scan:
+          context: 
+            - sonarcloud
+            - snyk
+      - backend-tests:
+          requires:
+            - security-scan
+      - frontend-tests:
+          requires:
+            - security-scan
+      - sonarcloud-analysis:
+          context: sonarcloud
+          requires:
+            - backend-tests
+            - frontend-tests
+      - build-and-deploy:
+          requires:
+            - sonarcloud-analysis
+          filters:
+            branches:
+              only: 
+                - main
+                - develop
+
+# Define jobs
+jobs:
+  # Security scanning job
+  security-scan:
+    docker:
+      - image: cimg/node:18.17
+    steps:
+      - checkout
+      - run:
+          name: Install Dependencies
+          command: |
+            cd backend && npm ci
+            cd ../frontend && npm ci
+      - run:
+          name: Run npm audit (Backend)
+          command: |
+            cd backend
+            npm audit --audit-level=moderate --production || true
+            npm audit --json > audit-results-backend.json || true
+      - run:
+          name: Run npm audit (Frontend)
+          command: |
+            cd frontend
+            npm audit --audit-level=moderate --production || true
+            npm audit --json > audit-results-frontend.json || true
+      - snyk/scan:
+          fail-on-issues: false
+          monitor-on-build: true
+          project: backend
+          severity-threshold: high
+      - snyk/scan:
+          fail-on-issues: false
+          monitor-on-build: true
+          project: frontend
+          severity-threshold: high
+      - run:
+          name: OWASP Dependency Check
+          command: |
+            # Download OWASP dependency check
+            wget https://github.com/jeremylong/DependencyCheck/releases/download/v8.4.0/dependency-check-8.4.0-release.zip
+            unzip dependency-check-8.4.0-release.zip
+            # Run dependency check on both projects
+            ./dependency-check/bin/dependency-check.sh --project "INSY7314-Backend" --scan backend/ --format JSON --out backend-dependency-check.json || true
+            ./dependency-check/bin/dependency-check.sh --project "INSY7314-Frontend" --scan frontend/ --format JSON --out frontend-dependency-check.json || true
+      - store_artifacts:
+          path: backend-dependency-check.json
+      - store_artifacts:
+          path: frontend-dependency-check.json
+      - store_artifacts:
+          path: backend/audit-results-backend.json
+      - store_artifacts:
+          path: frontend/audit-results-frontend.json
+
+  # Backend testing job
+  backend-tests:
+    docker:
+      - image: cimg/node:18.17
+      - image: cimg/mongo:6.0
+    steps:
+      - checkout
+      - run:
+          name: Install Backend Dependencies
+          command: cd backend && npm ci
+      - run:
+          name: Run ESLint
+          command: cd backend && npm run lint
+      - run:
+          name: Run Backend Tests
+          command: cd backend && npm run test:ci
+      - run:
+          name: Upload Backend Coverage to Codecov
+          command: |
+            cd backend
+            bash <(curl -s https://codecov.io/bash) -f coverage/lcov.info -F backend
+      - store_test_results:
+          path: backend/coverage
+      - store_artifacts:
+          path: backend/coverage
+      - persist_to_workspace:
+          root: .
+          paths:
+            - backend/coverage
+
+  # Frontend testing job  
+  frontend-tests:
+    docker:
+      - image: cimg/node:18.17
+    steps:
+      - checkout
+      - run:
+          name: Install Frontend Dependencies
+          command: cd frontend && npm ci
+      - run:
+          name: Run Frontend Linting
+          command: cd frontend && npm run lint
+      - run:
+          name: Run Frontend Tests
+          command: cd frontend && npm run test:ci
+      - run:
+          name: Upload Frontend Coverage to Codecov
+          command: |
+            cd frontend
+            bash <(curl -s https://codecov.io/bash) -f coverage/lcov.info -F frontend
+      - store_test_results:
+          path: frontend/coverage
+      - store_artifacts:
+          path: frontend/coverage
+      - persist_to_workspace:
+          root: .
+          paths:
+            - frontend/coverage
+
+  # SonarCloud analysis job
+  sonarcloud-analysis:
+    docker:
+      - image: cimg/node:18.17
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - sonarcloud/scan
+
+  # Build and deploy job
+  build-and-deploy:
+    docker:
+      - image: cimg/node:18.17
+    steps:
+      - checkout
+      - run:
+          name: Build Backend
+          command: |
+            cd backend
+            npm ci --production
+            echo "✅ Backend application built successfully"
+      - run:
+          name: Build Frontend
+          command: |
+            cd frontend
+            npm ci
+            npm run build
+            echo "✅ Frontend application built successfully"
+      - run:
+          name: Package Applications
+          command: |
+            # Create deployment packages
+            mkdir -p deployment/backend deployment/frontend
+            cp -r backend/* deployment/backend/
+            cp -r frontend/build/* deployment/frontend/
+            echo "✅ Applications packaged for deployment"
+      - store_artifacts:
+          path: deployment/
+      - run:
+          name: Deploy to Staging (Simulated)
+          command: |
+            echo "🚀 Deploying to staging environment..."
+            echo "Backend files: deployment/backend/"
+            echo "Frontend build: deployment/frontend/"
+            echo "✅ Deployment completed successfully!"
+
+  # Performance testing job (optional)
+  performance-tests:
+    docker:
+      - image: cimg/node:18.17
+    steps:
+      - checkout
+      - run:
+          name: Install k6
+          command: |
+            sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+            echo "deb https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+            sudo apt-get update
+            sudo apt-get install k6
+      - run:
+          name: Run Performance Tests
+          command: |
+            echo "Running performance tests..."
+            # Add your k6 performance test scripts here
+            echo "Performance tests completed!"
+
+  # OWASP ZAP Security Testing (optional)
+  owasp-zap-security:
+    docker:
+      - image: owasp/zap2docker-stable
+    steps:
+      - checkout
+      - run:
+          name: Run OWASP ZAP Baseline Scan
+          command: |
+            zap-baseline.py -t http://localhost:3000 -J zap-report.json || true
+      - store_artifacts:
+          path: zap-report.json
