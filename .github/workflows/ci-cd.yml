@@ -2,7 +2,7 @@ name: Comprehensive CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, Pipeline ]
   pull_request:
     branches: [ main ]
 
