@@ -67,35 +67,16 @@ PayFlow is a comprehensive secure payment portal designed for international tran
 
 ## 🏗️ System Architecture
 
-### System Overview
 ```mermaid
-graph TB
-    User[👤 User] --> Frontend[⚛️ React Frontend<br/>Port 3000]
-    Frontend --> API[🌐 Express API<br/>Port 5000]
-    API --> DB[(🗃️ MongoDB<br/>Database)]
-    API --> Auth[🔐 JWT Auth<br/>Middleware]
-    API --> Security[🛡️ Security<br/>Layer]
+graph LR
+    A[User] --> B[React Frontend]
+    B --> C[Express API]
+    C --> D[MongoDB]
     
-    subgraph "Frontend Layer"
-        Frontend
-    end
-    
-    subgraph "Backend Layer"
-        API
-        Auth
-        Security
-    end
-    
-    subgraph "Data Layer"
-        DB
-    end
-    
-    style User fill:#4f46e5,stroke:#1e1b4b,stroke-width:2px,color:#fff
-    style Frontend fill:#06b6d4,stroke:#0e7490,stroke-width:2px,color:#fff
-    style API fill:#10b981,stroke:#047857,stroke-width:2px,color:#fff
-    style DB fill:#f59e0b,stroke:#d97706,stroke-width:2px,color:#fff
-    style Auth fill:#ef4444,stroke:#dc2626,stroke-width:2px,color:#fff
-    style Security fill:#8b5cf6,stroke:#7c3aed,stroke-width:2px,color:#fff
+    style A fill:#4f46e5,color:#fff
+    style B fill:#06b6d4,color:#fff
+    style C fill:#10b981,color:#fff
+    style D fill:#f59e0b,color:#fff
 ```
 
 ### Backend Structure
@@ -121,13 +102,15 @@ frontend/
 │   └── App.jsx       # Main application
 ├── public/           # Static assets
 └── package.json      # Dependencies
-```---
+```
+
+---
 
 ## 🔒 Enterprise Security Framework
 
-![Security](https://img.shields.io/badge/Security-Enterprise_Grade-red?style=flat-square)
-![OWASP](https://img.shields.io/badge/OWASP-Top_10_Protected-orange?style=flat-square)
-![Compliance](https://img.shields.io/badge/Compliance-PCI_DSS-blue?style=flat-square)
+![Security](https://img.shields.io/badge/Security-Enterprise_Grade-red)
+![OWASP](https://img.shields.io/badge/OWASP-Top_10_Protected-orange)
+![Compliance](https://img.shields.io/badge/Compliance-PCI_DSS-blue)
 
 ### 🔐 Authentication & Authorization
 - 🎫 **JWT Tokens** with HTTP-Only cookies
@@ -187,7 +170,9 @@ PUT  /api/payments/:id     # Update payment status
 GET /api/employee/payments           # View all payments (admin)
 PUT /api/employee/payments/:id/verify # Verify payment
 GET /api/employee/dashboard          # Employee dashboard data
-```---
+```
+
+---
 
 ## 🚀 Quick Start
 
@@ -236,28 +221,15 @@ npm start
 
 ### Default Login Credentials
 - **Employee Username:** `bank_employee`
-- **Employee Password:** `Employee@123`### 🌐 **Browser Setup for Development**
-<details>
-<summary>Click to expand browser configuration for self-signed certificates</summary>
-
-**Windows:**
-```bash
-chrome.exe --ignore-certificate-errors --user-data-dir="C:/temp/chrome_dev" --disable-web-security
-```
-
-**macOS:**
-```bash
-open -a "Google Chrome" --args --ignore-certificate-errors --user-data-dir="/tmp/chrome_dev" --disable-web-security
-```
-</details>
+- **Employee Password:** `Employee@123`
 
 ---
 
 ## 🧪 Testing & Quality Assurance
 
-![Tests](https://img.shields.io/badge/Tests-Jest+Supertest-red?style=flat-square)
-![Coverage](https://img.shields.io/badge/Coverage-95%25+-brightgreen?style=flat-square)
-![Security](https://img.shields.io/badge/Security-OWASP_ZAP-orange?style=flat-square)
+![Tests](https://img.shields.io/badge/Tests-Jest+Supertest-red)
+![Coverage](https://img.shields.io/badge/Coverage-95%25+-brightgreen)
+![Security](https://img.shields.io/badge/Security-OWASP_ZAP-orange)
 
 ### 🔧 Backend Testing
 ```bash
@@ -292,39 +264,33 @@ npm run lint:security    # 🛡️ ESLint rules
 
 ## 🔄 CI/CD Pipeline
 
-![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat-square&logo=github-actions&logoColor=white)
-![SonarCloud](https://img.shields.io/badge/SonarCloud-F3702A?style=flat-square&logo=sonarcloud&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat&logo=github-actions&logoColor=white)
+![SonarCloud](https://img.shields.io/badge/SonarCloud-F3702A?style=flat&logo=sonarcloud&logoColor=white)
 
-### 🚀 **Pipeline Stages**
+### Pipeline Stages
 
 ```mermaid
 graph LR
-    A[📝 Code Push<br/>GitHub] --> B[🔍 Security Scan<br/>OWASP & Snyk]
-    B --> C[🧪 Run Tests<br/>Jest & Coverage]
-    C --> D[📊 Quality Gate<br/>SonarCloud]
-    D --> E[🏗️ Build<br/>React & Node]
-    E --> F[🚀 Deploy<br/>Production]
+    A[Code Push] --> B[Security Scan]
+    B --> C[Run Tests] 
+    C --> D[Quality Gate]
+    D --> E[Build]
+    E --> F[Deploy]
     
-    style A fill:#1e40af,stroke:#1e3a8a,stroke-width:3px,color:#fff
-    style B fill:#dc2626,stroke:#b91c1c,stroke-width:3px,color:#fff
-    style C fill:#059669,stroke:#047857,stroke-width:3px,color:#fff
-    style D fill:#d97706,stroke:#b45309,stroke-width:3px,color:#fff
-    style E fill:#7c3aed,stroke:#6d28d9,stroke-width:3px,color:#fff
-    style F fill:#0891b2,stroke:#0e7490,stroke-width:3px,color:#fff
+    style A fill:#1e40af,color:#fff
+    style B fill:#dc2626,color:#fff
+    style C fill:#059669,color:#fff
+    style D fill:#d97706,color:#fff
+    style E fill:#7c3aed,color:#fff
+    style F fill:#0891b2,color:#fff
 ```
 
-### 🔄 Workflow 1: Comprehensive CI/CD
-- 🔐 **Security Scanning**: OWASP, Snyk
-- 🧪 **Testing Suite**: Unit, Integration, E2E
-- 🏗️ **Build Process**: Frontend & Backend
+### Workflow Features
+- 🔐 **Security Scanning**: OWASP, Snyk vulnerability detection
+- 🧪 **Testing Suite**: Unit, Integration, E2E tests
+- 🏗️ **Build Process**: Frontend & Backend compilation
 - 📊 **Quality Analysis**: SonarCloud integration
 - 🚀 **Deployment**: Automated staging/production
-
-### 🛡️ Workflow 2: Security-First
-- 🔍 **SAST**: Static Application Security Testing
-- 📦 **Dependency Check**: Automated vulnerability scanning
-- 🔒 **License Compliance**: Legal compliance monitoring
-- 📋 **Security Reports**: Comprehensive vulnerability reports
 
 ---
 
@@ -378,7 +344,7 @@ npm run analyze        # 📊 Bundle analysis
 ## 🎥 Demo Videos
 
 ### 🔧 Backend API Walkthrough
-[![Backend Demo](https://img.shields.io/badge/Watch-Backend_Demo-red?style=flat-square&logo=youtube)](https://youtu.be/1fQPPgvUX4Q)
+[![Backend Demo](https://img.shields.io/badge/Watch-Backend_Demo-red?style=flat&logo=youtube)](https://youtu.be/1fQPPgvUX4Q)
 
 **Covers:**
 - API endpoints demonstration
@@ -387,7 +353,7 @@ npm run analyze        # 📊 Bundle analysis
 - Authentication flow
 
 ### 💳 Frontend Payment Gateway
-[![Frontend Demo](https://img.shields.io/badge/Watch-Frontend_Demo-blue?style=flat-square&logo=youtube)](https://youtu.be/DrvEL8eiAYk)
+[![Frontend Demo](https://img.shields.io/badge/Watch-Frontend_Demo-blue?style=flat&logo=youtube)](https://youtu.be/DrvEL8eiAYk)
 
 **Highlights:**
 - User interface walkthrough
@@ -404,6 +370,5 @@ This project is developed for educational purposes as part of the INSY7314 cours
 **⚠️ Academic Use Only**: This project is intended for educational purposes and should not be used in production environments without proper security review and hardening.
 
 ---
-
 
 *Last Updated: November 2025*
