@@ -3,7 +3,7 @@
 # Test settings
 test: backend frontend
 
-# Language settings  
+# Language settings
 language-settings:
   javascript:
     packageManager: npm

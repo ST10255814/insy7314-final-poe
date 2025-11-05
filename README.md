@@ -135,32 +135,7 @@ cd ../frontend
 npm install
 ```
 
-4. **Environment Configuration**
-
-Create `backend/.env`:
-```env
-# Database
-MONGO_URI=your_mongo_uri
-# or for MongoDB Atlas:
-# MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/
-
-# JWT Configuration
-JWT_SECRET=your-super-secure-jwt-secret-key-here
-JWT_EXPIRES_IN=1h
-
-# Server Configuration
-PORT=5000
-NODE_ENV=development
-
-# CSRF Protection
-CSRF_SECRET=your-csrf-secret-key-here
-
-# SSL Certificates (for HTTPS)
-SSL_KEY_PATH=./keys/privatekey.pem
-SSL_CERT_PATH=./keys/certificate.pem
-```
-
-5. **Start Development Servers**
+4. **Start Development Servers**
 
 Backend:
 ```bash
@@ -174,7 +149,7 @@ cd frontend
 npm start
 ```
 
-6. **Access the Application**
+5. **Access the Application**
 - Frontend: `https://localhost:3000`
 - Backend API: `https://localhost:5000`
 
@@ -207,15 +182,6 @@ npm run security:snyk   # Snyk vulnerability scan
 npm run lint            # ESLint security rules
 ```
 
-### Test Coverage
-Current coverage: **95%+**
-- Controllers: 98%
-- Services: 97%
-- Middleware: 96%
-- Utils: 99%
-
----
-
 ## � CI/CD Pipeline
 
 ### GitHub Actions Workflows
@@ -242,22 +208,6 @@ Current coverage: **95%+**
 - ✅ Security scan approval required
 - ✅ Code quality metrics meet standards
 - ✅ No high/critical security vulnerabilities
-
----
-
-## 📊 Monitoring & Analytics
-
-### Code Quality (SonarCloud)
-- **Maintainability Rating**: A
-- **Reliability Rating**: A  
-- **Security Rating**: A
-- **Coverage**: 95%+
-- **Duplicated Lines**: <3%
-
-### Performance Metrics
-- **Backend Response Time**: <200ms average
-- **Frontend Load Time**: <2s initial load
-- **Database Query Performance**: <50ms average
 
 ---
 
@@ -300,44 +250,9 @@ npm run security:audit # Security audit
 
 ---
 
-## 📚 Documentation
-
-### API Documentation
-- Comprehensive endpoint documentation
-- Request/response examples
-- Authentication requirements
-- Error handling guide
-
-### Security Documentation
-- Threat model analysis
-- Security architecture overview
-- Incident response procedures
-- Security testing reports
-
----
-
-## 🚨 Known Issues & Limitations
-
-### Current Limitations
-- Development certificates are self-signed
-- Rate limiting is basic (production should use Redis)
-- File upload functionality not implemented
-- Email notifications not configured
-
-### Future Enhancements
-- [ ] Redis caching for improved performance
-- [ ] Email notification system
-- [ ] File upload for payment receipts
-- [ ] Advanced reporting dashboard
-- [ ] Multi-factor authentication (MFA)
-- [ ] Advanced fraud detection
-
----
-
 ## 📞 Support & Contact
 
 ### Team Contacts
-- **Technical Issues**: [GitHub Issues](https://github.com/ST10255814/insy7314-final-poe/issues)
 - **Security Concerns**: Contact team leads directly
 - **Documentation**: Check project wiki
 
@@ -360,15 +275,6 @@ This project is developed for academic purposes as part of the INSY7314 course c
 
 > **Backend API Walkthrough**: [YouTube Video](https://youtu.be/1fQPPgvUX4Q)  
 > **Frontend Payment Gateway Demo**: [YouTube Video](https://youtu.be/DrvEL8eiAYk)  
-
----
-
-## 🙏 Acknowledgments
-
-- **OWASP Foundation** for security guidelines
-- **Node.js Security Working Group** for best practices
-- **React Security Guidelines** for frontend security
-- **Course Instructors** for guidance and feedback
 
 ---
 

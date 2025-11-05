@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/19</span>
+                <span class='fraction'>19/19</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/19</span>
+                <span class='fraction'>19/19</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -96,67 +96,67 @@
 <a name='L31'></a><a href='#L31'>31</a>
 <a name='L32'></a><a href='#L32'>32</a>
 <a name='L33'></a><a href='#L33'>33</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">//Services to be used
-const paymentService = <span class="cstat-no" title="statement not covered" >require('../service/paymentService');</span>
-const { sanitizeInput } = <span class="cstat-no" title="statement not covered" >require('../utils/validation');</span>
+const paymentService = require('../service/paymentService');
+const { sanitizeInput } = require('../utils/validation');
 &nbsp;
-<span class="cstat-no" title="statement not covered" >exports.getAllPayments = <span class="fstat-no" title="function not covered" >as</span>ync(req, res) =&gt;{</span>
-<span class="cstat-no" title="statement not covered" >  try{</span>
-    const user = <span class="cstat-no" title="statement not covered" >req.user;</span> // Retrieved from checkAuth middleware
-<span class="cstat-no" title="statement not covered" >    console.log(`Fetching payments for user: ${user.id}`);</span>
-    const payments = <span class="cstat-no" title="statement not covered" >await paymentService.getAllPayments(user);</span>
-<span class="cstat-no" title="statement not covered" >    res.status(200).json(payments);</span>
+exports.getAllPayments = async(req, res) =&gt;{
+  try{
+    const user = req.user; // Retrieved from checkAuth middleware
+    console.log(`Fetching payments for user: ${user.id}`);
+    const payments = await paymentService.getAllPayments(user);
+    res.status(200).json(payments);
   } catch (error) {
-<span class="cstat-no" title="statement not covered" >    res.status(500).json({ error: error.message });</span>
+    res.status(500).json({ error: error.message });
   }
 };
 &nbsp;
-<span class="cstat-no" title="statement not covered" >exports.CreatePayment = <span class="fstat-no" title="function not covered" >as</span>ync (req, res) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >  try {</span>
-    const user = <span class="cstat-no" title="statement not covered" >req.user;</span> // Retrieved from checkAuth middleware
+exports.CreatePayment = async (req, res) =&gt; {
+  try {
+    const user = req.user; // Retrieved from checkAuth middleware
 &nbsp;
     // Sanitize all input fields
-    const sanitizedPaymentData = <span class="cstat-no" title="statement not covered" >{};</span>
-<span class="cstat-no" title="statement not covered" >    for (const [key, value] of Object.entries(req.body)) {</span>
-<span class="cstat-no" title="statement not covered" >      sanitizedPaymentData[key] = sanitizeInput(value);</span>
+    const sanitizedPaymentData = {};
+    for (const [key, value] of Object.entries(req.body)) {
+      sanitizedPaymentData[key] = sanitizeInput(value);
     }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    console.log(`Creating payment for user: ${user.id}`);</span>
-    const paymentIntent = <span class="cstat-no" title="statement not covered" >await paymentService.CreatePayment(user, sanitizedPaymentData);</span>
-<span class="cstat-no" title="statement not covered" >    res.status(200).json(paymentIntent);</span>
+    console.log(`Creating payment for user: ${user.id}`);
+    const paymentIntent = await paymentService.CreatePayment(user, sanitizedPaymentData);
+    res.status(200).json(paymentIntent);
   } catch (error) {
-<span class="cstat-no" title="statement not covered" >    res.status(500).json({ error: error.message });</span>
+    res.status(500).json({ error: error.message });
   }
 };
 &nbsp;</pre></td></tr></table></pre>
@@ -166,7 +166,7 @@ const { sanitizeInput } = <span class="cstat-no" title="statement not covered" >
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-05T16:20:08.001Z
+                at 2025-11-05T17:00:54.042Z
             </div>
         <script src="../prettify.js"></script>
         <script>
