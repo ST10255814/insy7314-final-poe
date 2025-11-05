@@ -1,8 +1,25 @@
-const { getAllPayments, CreatePayment } = require('../../controller/paymentController');
-const paymentService = require('../../service/paymentService');
+// Mock the database module before requiring paymentController
+jest.mock('../../database/db', () => ({
+  client: {
+    db: jest.fn(() => ({
+      collection: jest.fn(() => ({
+        findOne: jest.fn(),
+        insertOne: jest.fn(),
+        updateOne: jest.fn(),
+        deleteOne: jest.fn(),
+        find: jest.fn(() => ({
+          toArray: jest.fn()
+        }))
+      }))
+    }))
+  }
+}));
 
 // Mock the paymentService
 jest.mock('../../service/paymentService');
+
+const { getAllPayments, CreatePayment } = require('../../controller/paymentController');
+const paymentService = require('../../service/paymentService');
 
 describe('Payment Controller', () => {
   let req, res;
