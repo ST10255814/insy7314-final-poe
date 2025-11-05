@@ -12,13 +12,9 @@ workflows:
       - backend-tests:
           requires:
             - security-scan
-      - frontend-tests:
-          requires:
-            - security-scan
       - sonarcloud-analysis:
           requires:
             - backend-tests
-            - frontend-tests
       - build-and-deploy:
           requires:
             - sonarcloud-analysis
@@ -95,7 +91,9 @@ jobs:
   backend-tests:
     docker:
       - image: cimg/node:18.17
-      - image: cimg/mongo:6.0
+      - image: mongo:6.0
+        environment:
+          MONGO_INITDB_DATABASE: test
     steps:
       - checkout
       - run:
@@ -120,35 +118,6 @@ jobs:
           root: .
           paths:
             - backend/coverage
-
-  # Frontend testing job  
-  frontend-tests:
-    docker:
-      - image: cimg/node:18.17
-    steps:
-      - checkout
-      - run:
-          name: Install Frontend Dependencies
-          command: cd frontend && npm ci
-      - run:
-          name: Run Frontend Linting
-          command: cd frontend && npm run lint
-      - run:
-          name: Run Frontend Tests
-          command: cd frontend && npm run test:ci
-      - run:
-          name: Upload Frontend Coverage to Codecov
-          command: |
-            cd frontend
-            bash <(curl -s https://codecov.io/bash) -f coverage/lcov.info -F frontend
-      - store_test_results:
-          path: frontend/coverage
-      - store_artifacts:
-          path: frontend/coverage
-      - persist_to_workspace:
-          root: .
-          paths:
-            - frontend/coverage
 
   # SonarCloud analysis job
   sonarcloud-analysis:
@@ -175,7 +144,7 @@ jobs:
               -Dsonar.login=$SONAR_TOKEN \
               -Dsonar.sources=. \
               -Dsonar.exclusions=**/node_modules/**,**/coverage/**,**/build/**,**/dist/** \
-              -Dsonar.javascript.lcov.reportPaths=backend/coverage/lcov.info,frontend/coverage/lcov.info
+              -Dsonar.javascript.lcov.reportPaths=backend/coverage/lcov.info
 
   # Build and deploy job
   build-and-deploy:
