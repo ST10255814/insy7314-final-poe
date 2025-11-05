@@ -202,8 +202,10 @@ async function getSubmittedPayments() {
         const PaymentsCollection = db.collection('Payments');
         const UsersCollection = db.collection('Users');
         
-        // Get all payments with submitted status
-        const submittedPayments = await PaymentsCollection.find({ status: 'verified' }).toArray();
+        // Get all payments with verified or submitted status
+        const submittedPayments = await PaymentsCollection.find({ 
+            status: { $in: ['verified', 'submitted'] } 
+        }).toArray();
         
         // Enrich with user information
         const enrichedPayments = await Promise.all(
@@ -237,11 +239,15 @@ async function markPaymentAsSentToSwift(paymentId) {
             throw new Error('Payment not found');
         }
 
-        await PaymentsCollection.updateOne(
+        if(payment.status !== 'verified'){
+            throw new Error('Payment must be verified before it can be sent to SWIFT');
+        }
+
+        const result = await PaymentsCollection.updateOne(
             { _id: toObjectId(paymentId) },
             {
                 $set: {
-                    status: 'Sent to Swift',
+                    status: 'submitted',
                     sentToSwiftAt: new Date(),
                     swiftTransactionId: `SWIFT${Date.now()}${Math.floor(Math.random() * 1000)}`, // Simulated SWIFT transaction ID
                     submittedAt: new Date(),
@@ -249,6 +255,13 @@ async function markPaymentAsSentToSwift(paymentId) {
                 }
             }
         );
+
+        if (result.matchedCount === 0) {
+            throw new Error('Payment not found');
+        }
+
+        console.log(`Payment ${paymentId} marked as sent to SWIFT successfully`);
+        return { message: 'Payment successfully sent to SWIFT portal', status: 'submitted' };
     }catch(error){
         console.error(`Error marking payment as sent to SWIFT: ${error.message}`);
         throw new Error('Error marking payment as sent to SWIFT');

@@ -20,9 +20,9 @@ export default function SubmittedPaymentCard({ payment, index }) {
     });
   };
 
-  const submitToSwiftPortal = () => {
+  const submitToSwiftPortal = async () => {
     try{
-        const response = api.post(`/api/employee/updateSwift/${payment._id}`);
+        const response = await api.post(`/api/employee/updateSwift/${payment._id}`);
         showSuccessToast(response.data.message);
     }
     catch(error){

@@ -68,7 +68,7 @@ const validateCSRF = (req, res, next) => {
     
     const cookieToken = req.cookies['csrf-token']
     const headerToken = req.headers['x-csrf-token'] || req.headers['csrf-token']
-    const bodyToken = req.body._csrf
+    const bodyToken = req.body && req.body._csrf // Safe access to req.body
     
     console.log('CSRF Validation:', {
         method: req.method,
