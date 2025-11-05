@@ -40,8 +40,14 @@ jobs:
       - run:
           name: Install Dependencies
           command: |
-            cd backend && npm ci
-            cd ../frontend && npm ci
+            cd backend
+            rm -rf node_modules package-lock.json
+            npm cache clean --force
+            npm install
+            cd ../frontend
+            rm -rf node_modules package-lock.json
+            npm cache clean --force
+            npm install
       - run:
           name: Run npm audit (Backend)
           command: |
@@ -115,7 +121,11 @@ jobs:
       - checkout
       - run:
           name: Install Backend Dependencies
-          command: cd backend && npm ci
+          command: |
+            cd backend
+            rm -rf node_modules package-lock.json
+            npm cache clean --force
+            npm install
       - run:
           name: Run ESLint
           command: cd backend && npm run lint
@@ -190,15 +200,19 @@ jobs:
           name: Build Backend
           command: |
             cd backend
-            npm ci --production
-            echo "✅ Backend application built successfully"
+            rm -rf node_modules package-lock.json
+            npm cache clean --force
+            npm install --production
+            echo "Backend application built successfully"
       - run:
           name: Build Frontend
           command: |
             cd frontend
-            npm ci
+            rm -rf node_modules package-lock.json
+            npm cache clean --force
+            npm install
             npm run build
-            echo "✅ Frontend application built successfully"
+            echo "Frontend application built successfully"
       - run:
           name: Package Applications
           command: |
@@ -206,16 +220,16 @@ jobs:
             mkdir -p deployment/backend deployment/frontend
             cp -r backend/* deployment/backend/
             cp -r frontend/build/* deployment/frontend/
-            echo "✅ Applications packaged for deployment"
+            echo "Applications packaged for deployment"
       - store_artifacts:
           path: deployment/
       - run:
           name: Deploy to Staging (Simulated)
           command: |
-            echo "🚀 Deploying to staging environment..."
+            echo "Deploying to staging environment..."
             echo "Backend files: deployment/backend/"
             echo "Frontend build: deployment/frontend/"
-            echo "✅ Deployment completed successfully!"
+            echo "Deployment completed successfully!"
 
   # Performance testing job (optional)
   performance-tests:
