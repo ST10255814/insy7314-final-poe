@@ -9,11 +9,11 @@ beforeAll(async () => {
   // Start MongoDB Memory Server
   mongod = await MongoMemoryServer.create();
   const uri = mongod.getUri();
-  
+
   // Connect to the in-memory database
   client = new MongoClient(uri);
   await client.connect();
-  
+
   // Set up global variables for tests
   global.__MONGO_URI__ = uri;
   global.__MONGO_DB_NAME__ = 'test-db';

@@ -1,11 +1,9 @@
-const { MongoClient, ObjectId } = require('mongodb');
+const { ObjectId } = require('mongodb');
 const {
   getAllPayments,
   CreatePayment,
   getPendingPayments,
   verifySwiftCode,
-  submitToSwift,
-  getSubmittedPayments,
   markPaymentAsSentToSwift
 } = require('../../service/paymentService');
 
@@ -69,15 +67,15 @@ describe('PaymentService', () => {
 
       const result = await getAllPayments(mockUser);
 
-      expect(paymentsCollection.find).toHaveBeenCalledWith({ 
-        userId: new ObjectId(mockUser.id) 
+      expect(paymentsCollection.find).toHaveBeenCalledWith({
+        userId: new ObjectId(mockUser.id)
       });
       expect(result).toEqual(mockPayments);
     });
 
     it('should throw error when database operation fails', async () => {
       const mockUser = { id: '507f1f77bcf86cd799439011' };
-      
+
       paymentsCollection.find.mockReturnValue({
         toArray: jest.fn().mockRejectedValue(new Error('Database error'))
       });
@@ -136,11 +134,11 @@ describe('PaymentService', () => {
   describe('getPendingPayments', () => {
     it('should fetch pending payments with user information', async () => {
       const mockPayments = [
-        { 
-          _id: new ObjectId(), 
+        {
+          _id: new ObjectId(),
           userId: new ObjectId('507f1f77bcf86cd799439011'),
           status: 'pending',
-          amount: 100 
+          amount: 100
         }
       ];
 
@@ -153,7 +151,7 @@ describe('PaymentService', () => {
       paymentsCollection.find.mockReturnValue({
         toArray: jest.fn().mockResolvedValue(mockPayments)
       });
-      
+
       usersCollection.findOne.mockResolvedValue(mockUser);
 
       const result = await getPendingPayments();
