@@ -2,18 +2,13 @@ version: 2.1
 
 orbs:
   node: circleci/node@5.1.0
-  sonarcloud: sonarsource/sonarcloud@2.0.0
-  snyk: snyk/snyk@2.0.2
 
 # Define workflows
 workflows:
   version: 2
   ci-cd-pipeline:
     jobs:
-      - security-scan:
-          context: 
-            - sonarcloud
-            - snyk
+      - security-scan
       - backend-tests:
           requires:
             - security-scan
@@ -21,7 +16,6 @@ workflows:
           requires:
             - security-scan
       - sonarcloud-analysis:
-          context: sonarcloud
           requires:
             - backend-tests
             - frontend-tests
@@ -59,16 +53,24 @@ jobs:
             cd frontend
             npm audit --audit-level=moderate --production || true
             npm audit --json > audit-results-frontend.json || true
-      - snyk/scan:
-          fail-on-issues: false
-          monitor-on-build: true
-          project: backend
-          severity-threshold: high
-      - snyk/scan:
-          fail-on-issues: false
-          monitor-on-build: true
-          project: frontend
-          severity-threshold: high
+      - run:
+          name: Install Snyk CLI
+          command: npm install -g snyk
+      - run:
+          name: Authenticate Snyk
+          command: snyk auth $SNYK_TOKEN
+      - run:
+          name: Snyk Test Backend
+          command: |
+            cd backend
+            snyk test --severity-threshold=high || true
+            snyk monitor || true
+      - run:
+          name: Snyk Test Frontend
+          command: |
+            cd frontend
+            snyk test --severity-threshold=high || true
+            snyk monitor || true
       - run:
           name: OWASP Dependency Check
           command: |
@@ -154,7 +156,24 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - sonarcloud/scan
+      - run:
+          name: Install SonarScanner
+          command: |
+            wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
+            unzip sonar-scanner-cli-4.8.0.2856-linux.zip
+            sudo mv sonar-scanner-4.8.0.2856-linux /opt/sonar-scanner
+            sudo ln -s /opt/sonar-scanner/bin/sonar-scanner /usr/local/bin/sonar-scanner
+      - run:
+          name: Run SonarCloud Scan
+          command: |
+            sonar-scanner \
+              -Dsonar.projectKey=$SONAR_PROJECT_KEY \
+              -Dsonar.organization=$SONAR_ORG_KEY \
+              -Dsonar.host.url=https://sonarcloud.io \
+              -Dsonar.login=$SONAR_TOKEN \
+              -Dsonar.sources=. \
+              -Dsonar.exclusions=**/node_modules/**,**/coverage/**,**/build/**,**/dist/** \
+              -Dsonar.javascript.lcov.reportPaths=backend/coverage/lcov.info,frontend/coverage/lcov.info
 
   # Build and deploy job
   build-and-deploy:
