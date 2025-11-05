@@ -128,8 +128,15 @@ const httpApp = express();
 
 // Apply HTTPS redirect middleware to HTTP server - this handles all routes
 httpApp.use((req, res) => {
-  const httpsUrl = `https://${req.header('host') || 'localhost'}:${PORT}${req.url}`;
-  res.redirect(301, httpsUrl);
+  // Build the HTTPS URL for redirection
+  const httpsUrl = `https://localhost:${PORT}${req.url}`;
+  // Validate the URL before redirecting to prevent open redirect attacks
+  if (httpsUrl.startsWith(`https://localhost:${PORT}/`)) {
+    res.redirect(301, httpsUrl);
+  } else {
+    // If validation fails, redirect to safe default
+    res.redirect(301, `https://localhost:${PORT}/`);
+  }
 });
 
 const httpServer = http.createServer(httpApp);
