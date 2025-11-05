@@ -1,3 +1,18 @@
+// Mock the database connection before importing anything else
+jest.mock('../../database/db', () => ({
+  client: {
+    db: jest.fn().mockReturnValue({
+      collection: jest.fn().mockReturnValue({
+        find: jest.fn().mockReturnValue({ toArray: jest.fn() }),
+        findOne: jest.fn(),
+        insertOne: jest.fn(),
+        updateOne: jest.fn()
+      })
+    })
+  },
+  connectMongo: jest.fn()
+}));
+
 const userRoutes = require('../../auth/user');
 
 describe('User Routes', () => {
