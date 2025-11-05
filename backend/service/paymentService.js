@@ -209,7 +209,7 @@ async function getSubmittedPayments() {
         const UsersCollection = db.collection('Users');
         
         // Get all payments with submitted status
-        const submittedPayments = await PaymentsCollection.find({ status: 'submitted' }).toArray();
+        const submittedPayments = await PaymentsCollection.find({ status: 'verified' }).toArray();
         
         // Enrich with user information
         const enrichedPayments = await Promise.all(
