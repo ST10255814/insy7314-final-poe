@@ -1,4 +1,4 @@
-import { FaEye, FaCheck, FaExclamationTriangle } from "react-icons/fa";
+import { FaEye } from "react-icons/fa";
 import LoadingButton from "./LoadingButton";
 
 export default function EmployeePaymentCard({ 
@@ -115,7 +115,6 @@ export default function EmployeePaymentCard({
             onClick={() => onVerifySwift(payment._id, payment.accountInformation.swiftCode)}
             className="flex-1 bg-[#007768] hover:bg-[#005f57] text-white py-3 px-4 rounded-xl flex items-center justify-center transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
           >
-            <FaCheck className="mr-2" />
             Verify SWIFT Code
           </LoadingButton>
         )}
@@ -127,7 +126,6 @@ export default function EmployeePaymentCard({
             onClick={() => onSubmitToSwift(payment._id)}
             className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-xl flex items-center justify-center transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
           >
-            <FaExclamationTriangle className="mr-2" />
             Submit to SWIFT
           </LoadingButton>
         )}

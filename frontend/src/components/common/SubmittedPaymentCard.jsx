@@ -1,34 +1,22 @@
 import { FaCheck, FaUser } from "react-icons/fa";
-import api from "../../lib/axios.js";
-import { showErrorToast, showSuccessToast } from "../../utils/toastHelper";
 
 export default function SubmittedPaymentCard({ payment, index }) {
   const formatAmount = (amount, currency) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency || 'USD'
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency || "USD",
     }).format(amount);
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
-
-  const submitToSwiftPortal = async () => {
-    try{
-        const response = await api.post(`/api/employee/updateSwift/${payment._id}`);
-        showSuccessToast(response.data.message);
-    }
-    catch(error){
-        showErrorToast(error.response?.data?.error || "Failed to submit to SWIFT portal");
-    }
-  }
 
   return (
     <div
@@ -61,13 +49,16 @@ export default function SubmittedPaymentCard({ payment, index }) {
           </h4>
           <div className="space-y-2 text-sm sm:text-base text-gray-700">
             <p>
-              <span className="font-medium">Amount:</span> {formatAmount(payment.amount, payment.currency)}
+              <span className="font-medium">Amount:</span>{" "}
+              {formatAmount(payment.amount, payment.currency)}
             </p>
             <p>
-              <span className="font-medium">Bank:</span> {payment.serviceProvider}
+              <span className="font-medium">Bank:</span>{" "}
+              {payment.serviceProvider}
             </p>
             <p>
-              <span className="font-medium">Created:</span> {formatDate(payment.createdAt)}
+              <span className="font-medium">Created:</span>{" "}
+              {formatDate(payment.createdAt)}
             </p>
           </div>
         </div>
@@ -79,13 +70,16 @@ export default function SubmittedPaymentCard({ payment, index }) {
           </h4>
           <div className="space-y-2 text-sm sm:text-base text-gray-700">
             <p>
-              <span className="font-medium">Account Holder:</span> {payment.accountInformation.accountHolderName}
+              <span className="font-medium">Account Holder:</span>{" "}
+              {payment.accountInformation.accountHolderName}
             </p>
             <p>
-              <span className="font-medium">Account Type:</span> {payment.accountInformation.accountType}
+              <span className="font-medium">Account Type:</span>{" "}
+              {payment.accountInformation.accountType}
             </p>
             <p>
-              <span className="font-medium">Branch Code:</span> {payment.accountInformation.branchCode}
+              <span className="font-medium">Branch Code:</span>{" "}
+              {payment.accountInformation.branchCode}
             </p>
             <p className="flex flex-col sm:flex-row sm:items-center gap-1">
               <span className="font-medium">SWIFT Code:</span>
@@ -104,26 +98,18 @@ export default function SubmittedPaymentCard({ payment, index }) {
           </h4>
           <div className="space-y-2 text-sm sm:text-base text-gray-700">
             <p>
-              <span className="font-medium">Verified By:</span> {payment.verifiedBy}
+              <span className="font-medium">Verified By:</span>{" "}
+              {payment.verifiedBy}
             </p>
             <p>
-              <span className="font-medium">Verified At:</span> {formatDate(payment.verifiedAt)}
+              <span className="font-medium">Verified At:</span>{" "}
+              {formatDate(payment.verifiedAt)}
             </p>
             <div>
-              {payment.status === 'submitted' ? (
-                <>
-                  <p className="font-medium mb-1">SWIFT Transaction ID:</p>
-                  <p className="px-2 py-1 bg-green-100 text-green-800 rounded-lg font-mono text-xs break-all border border-green-200">
-                    {payment.swiftTransactionId}
-                  </p>
-                </>
-              ) : (
-                <button
-                onClick={() => submitToSwiftPortal(payment._id)}
-                className="w-full bg-[#007768] hover:bg-[#005f57] text-white py-3 px-4 rounded-xl flex items-center justify-center transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl font-medium">
-                  Submit to SWIFT
-                </button>
-              )}
+              <p className="font-medium mb-1">SWIFT Transaction ID:</p>
+              <p className="px-2 py-1 bg-green-100 text-green-800 rounded-lg font-mono text-xs break-all border border-green-200">
+                {payment.swiftTransactionId}
+              </p>
             </div>
           </div>
         </div>

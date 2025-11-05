@@ -21,6 +21,8 @@ export default function PaymentCard({ payment, index }) {
               ? "bg-yellow-100 text-yellow-800"
               : payment.status === "verified"
               ? "bg-green-100 text-green-800"
+              : payment.status === "submitted to Swift"
+              ? "bg-blue-100 text-blue-800"
               : "bg-gray-100 text-gray-800"
           }`}
         >
