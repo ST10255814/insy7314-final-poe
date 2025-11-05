@@ -18,34 +18,42 @@ const generateCSRFToken = () => {
  * Sets CSRF token in both cookie and makes it available for headers
  */
 const setCSRFToken = (req, res, next) => {
-    // Check if token already exists in cookie
-    let token = req.cookies['csrf-token']
-    
-    // Generate new token if none exists or if it's expired
-    if (!token) {
-        token = generateCSRFToken()
-        console.log('Generated new CSRF token:', token.substring(0, 8) + '...')
+    try {
+        console.log('setCSRFToken middleware called for:', req.method, req.url)
         
-        // Set CSRF token in cookie with SameSite=Strict
-        res.cookie('csrf-token', token, {
-            httpOnly: true, // Allow JS access for header inclusion
-            secure: process.env.NODE_ENV === 'production' , // HTTPS only in production
-            sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax', // More permissive in development
-            maxAge: 3600000, // 1 hour
-            path: '/'
-        })
-    } else {
-        console.log('Using existing CSRF token:', token.substring(0, 8) + '...')
+        // Check if token already exists in cookie
+        let token = req.cookies['csrf-token']
+        
+        // Generate new token if none exists or if it's expired
+        if (!token) {
+            token = generateCSRFToken()
+            console.log('Generated new CSRF token:', token.substring(0, 8) + '...')
+            
+            // Set CSRF token in cookie with SameSite=Strict
+            res.cookie('csrf-token', token, {
+                httpOnly: false, // Allow JS access for header inclusion
+                secure: process.env.NODE_ENV === 'production' , // HTTPS only in production
+                sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax', // More permissive in development
+                maxAge: 3600000, // 1 hour
+                path: '/'
+            })
+        } else {
+            console.log('Using existing CSRF token:', token.substring(0, 8) + '...')
+        }
+        
+        // Make token available for response and request
+        res.locals.csrfToken = token
+        req.csrfToken = token
+        
+        // Add CSRF token to response headers for easy client access
+        res.setHeader('X-CSRF-Token', token)
+        
+        console.log('CSRF token middleware completed successfully')
+        next()
+    } catch (error) {
+        console.error('Error in setCSRFToken middleware:', error)
+        next(error)
     }
-    
-    // Make token available for response and request
-    res.locals.csrfToken = token
-    req.csrfToken = token
-    
-    // Add CSRF token to response headers for easy client access
-    res.setHeader('X-CSRF-Token', token)
-    
-    next()
 }
 
 /**
@@ -126,26 +134,41 @@ const validateCSRF = (req, res, next) => {
  * Endpoint to get CSRF token for AJAX requests
  */
 const getCSRFToken = (req, res) => {
-    // Generate a new token if one doesn't exist
-    let token = req.csrfToken || res.locals.csrfToken
-    
-    if (!token) {
-        token = generateCSRFToken()
+    try {
+        console.log('CSRF token endpoint called')
         
-        // Set CSRF token in cookie
-        res.cookie('csrf-token', token, {
-            httpOnly: true, // Prevent JS access for security
-            secure: process.env.NODE_ENV === 'production', // HTTPS only in production
-            sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax', // More permissive in development
-            maxAge: 3600000, // 1 hour
-            path: '/'
+        // Generate a new token if one doesn't exist
+        let token = req.csrfToken || res.locals.csrfToken
+        
+        if (!token) {
+            console.log('No existing token, generating new one')
+            token = generateCSRFToken()
+            
+            // Set CSRF token in cookie
+            res.cookie('csrf-token', token, {
+                httpOnly: false, // Allow JS access for header inclusion
+                secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+                sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax', // More permissive in development
+                maxAge: 3600000, // 1 hour
+                path: '/'
+            })
+            console.log('New CSRF token generated and cookie set')
+        } else {
+            console.log('Using existing token from middleware')
+        }
+        
+        console.log('Sending CSRF token response')
+        res.json({
+            csrfToken: token,
+            message: 'CSRF token generated successfully'
+        })
+    } catch (error) {
+        console.error('Error in getCSRFToken:', error)
+        res.status(500).json({
+            error: 'Internal server error',
+            message: 'Failed to generate CSRF token'
         })
     }
-    
-    res.json({
-        csrfToken: token,
-        message: 'CSRF token generated successfully'
-    })
 }
 
 module.exports = {

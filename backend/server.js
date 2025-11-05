@@ -32,24 +32,41 @@ app.use(cors({
         // Whitelist of allowed origins
         const allowedOrigins = [
             process.env.FRONTEND_URL || 'https://localhost:3000',
+            'https://localhost:3000',
             'https://localhost:3001', // Only for development
             'http://localhost:3000', // Allow HTTP for development
             'http://localhost:3001'  // Allow HTTP for development
         ]
         
         console.log('CORS check - Origin:', origin, 'Allowed origins:', allowedOrigins)
+        console.log('NODE_ENV:', process.env.NODE_ENV)
         
         // In production, be stricter
         if (process.env.NODE_ENV === 'production') {
             if (!origin || !allowedOrigins.includes(origin)) {
+                console.log('CORS blocked in production mode:', origin)
                 return callback(new Error('Blocked by CORS policy'), false)
             }
         } else {
-            // Development: still validate but allow localhost variations
-            if (origin && !allowedOrigins.includes(origin) && 
-                !origin.match(/^https?:\/\/(localhost|127\.0\.0\.1):(3000|3001)$/)) {
+            // Development: be more permissive with localhost
+            if (origin) {
+                // Check exact matches first
+                if (allowedOrigins.includes(origin)) {
+                    console.log('CORS allowed - exact match:', origin)
+                    return callback(null, true)
+                }
+                // Check localhost pattern
+                if (origin.match(/^https?:\/\/(localhost|127\.0\.0\.1):(3000|3001)$/)) {
+                    console.log('CORS allowed - localhost pattern:', origin)
+                    return callback(null, true)
+                }
+                // Block if not matching
                 console.log('CORS blocked origin:', origin)
                 return callback(new Error('Blocked by CORS policy'), false)
+            } else {
+                // Allow requests without origin (like server-to-server or tools)
+                console.log('CORS allowed - no origin header')
+                return callback(null, true)
             }
         }
         
