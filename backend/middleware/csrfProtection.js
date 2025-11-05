@@ -166,7 +166,7 @@ const getCSRFToken = (req, res) => {
         console.error('Error in getCSRFToken:', error)
         res.status(500).json({
             error: 'Internal server error',
-            message: 'Failed to generate CSRF token'
+            message: 'Failed to generate CSRF token or fetch CSRF token from cookies'
         })
     }
 }
