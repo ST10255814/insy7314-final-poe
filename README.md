@@ -140,13 +140,13 @@ npm install
 Create `backend/.env`:
 ```env
 # Database
-MONGODB_URI=mongodb://localhost:27017/payflow
+MONGO_URI=your_mongo_uri
 # or for MongoDB Atlas:
-# MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/payflow
+# MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/
 
 # JWT Configuration
 JWT_SECRET=your-super-secure-jwt-secret-key-here
-JWT_EXPIRES_IN=24h
+JWT_EXPIRES_IN=1h
 
 # Server Configuration
 PORT=5000

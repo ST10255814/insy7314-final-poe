@@ -23,18 +23,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: |
-            backend/package-lock.json
-            frontend/package-lock.json
       
-      - name: Clear npm cache
-        run: npm cache clean --force
-      
-      - name: Install dependencies
+      - name: Clean install dependencies
         run: |
-          cd backend && npm ci
-          cd ../frontend && npm ci
+          cd backend
+          rm -rf node_modules package-lock.json
+          npm cache clean --force
+          npm install
+          cd ../frontend
+          rm -rf node_modules package-lock.json
+          npm cache clean --force
+          npm install
       
       - name: Run npm audit (Backend)
         run: |
@@ -100,14 +99,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
-      
-      - name: Clear npm cache
-        run: npm cache clean --force
       
       - name: Install Backend Dependencies
-        run: cd backend && npm ci
+        run: |
+          cd backend
+          rm -rf node_modules package-lock.json
+          npm cache clean --force
+          npm install
       
       - name: Run ESLint
         run: cd backend && npm run lint
@@ -142,14 +140,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
-      
-      - name: Clear npm cache
-        run: npm cache clean --force
       
       - name: Install Frontend Dependencies
-        run: cd frontend && npm ci
+        run: |
+          cd frontend
+          rm -rf node_modules package-lock.json
+          npm cache clean --force
+          npm install
       
       - name: Run Frontend Linting
         run: cd frontend && npm run lint
@@ -199,21 +196,22 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Clear npm cache
-        run: npm cache clean --force
-
       - name: Build Backend Application
         run: |
           cd backend
-          npm ci
-          echo "✅ Backend application built successfully"
+          rm -rf node_modules package-lock.json
+          npm cache clean --force
+          npm install
+          echo "Backend application built successfully"
 
       - name: Build Frontend Application
         run: |
           cd frontend
-          npm ci
+          rm -rf node_modules package-lock.json
+          npm cache clean --force
+          npm install
           npm run build
-          echo "✅ Frontend application built successfully"
+          echo "Frontend application built successfully"
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
@@ -234,10 +232,10 @@ jobs:
       
       - name: Deploy to Staging (Simulation)
         run: |
-          echo "🚀 Deploying to staging environment..."
+          echo "Deploying to staging environment..."
           echo "Backend files ready for deployment"
           echo "Frontend build ready for deployment"
-          echo "✅ Deployment completed successfully!"
+          echo "Deployment completed successfully!"
 
   performance-tests:
     name: Performance Testing
@@ -271,9 +269,9 @@ jobs:
 
       - name: Run performance tests (simulation)
         run: |
-          echo "🏃‍♂️ Running performance tests..."
-          echo "✅ Performance tests completed successfully!"
-          echo "📊 Results: Average response time: 150ms, 95th percentile: 300ms"
+          echo "Running performance tests..."
+          echo "Performance tests completed successfully!"
+          echo "Results: Average response time: 150ms, 95th percentile: 300ms"
 
   owasp-zap-scan:
     name: OWASP ZAP Security Scan
@@ -286,10 +284,10 @@ jobs:
 
       - name: ZAP Scan (Simulation)
         run: |
-          echo "🔍 Running OWASP ZAP security scan..."
+          echo "Running OWASP ZAP security scan..."
           echo "Target: http://localhost:3000"
-          echo "✅ Security scan completed successfully!"
-          echo "🛡️ No high-risk vulnerabilities found"
+          echo "Security scan completed successfully!"
+          echo "No high-risk vulnerabilities found"
 
   pipeline-summary:
     name: Pipeline Summary
@@ -299,25 +297,25 @@ jobs:
     steps:
       - name: Generate Comprehensive Pipeline Summary
         run: |
-          echo "# 🔄 Comprehensive CI/CD Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "# Comprehensive CI/CD Pipeline Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## 📊 Job Results:" >> $GITHUB_STEP_SUMMARY
-          echo "- **🔒 Security Scan & OWASP**: ${{ needs.security-scan.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **🧪 Backend Tests & Linting**: ${{ needs.backend-tests.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **⚛️ Frontend Build & Linting**: ${{ needs.frontend-build.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **📈 SonarCloud Code Quality**: ${{ needs.sonarcloud.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **🏗️ Build & Test Applications**: ${{ needs.build-and-test.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **🚀 Deploy to Staging**: ${{ needs.deploy-staging.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **🏃‍♂️ Performance Tests**: ${{ needs.performance-tests.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **🛡️ OWASP ZAP Security Scan**: ${{ needs.owasp-zap-scan.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "## Job Results:" >> $GITHUB_STEP_SUMMARY
+          echo "- **Security Scan & OWASP**: ${{ needs.security-scan.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Backend Tests & Linting**: ${{ needs.backend-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Frontend Build & Linting**: ${{ needs.frontend-build.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **SonarCloud Code Quality**: ${{ needs.sonarcloud.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build & Test Applications**: ${{ needs.build-and-test.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Deploy to Staging**: ${{ needs.deploy-staging.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Performance Tests**: ${{ needs.performance-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **OWASP ZAP Security Scan**: ${{ needs.owasp-zap-scan.result }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## 🎯 Key Features Implemented:" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ **Unit Testing**: Jest for backend only" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ **Security Testing**: NPM Audit, Snyk, OWASP Dependency Check" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ **Code Quality**: ESLint, SonarCloud analysis" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ **Coverage Reporting**: Codecov integration" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ **Build Verification**: Application build testing" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ **Performance Testing**: K6 load testing simulation" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ **OWASP ZAP**: Web application security testing" >> $GITHUB_STEP_SUMMARY
+          echo "## Key Features Implemented:" >> $GITHUB_STEP_SUMMARY
+          echo "- **Unit Testing**: Jest for backend only" >> $GITHUB_STEP_SUMMARY
+          echo "- **Security Testing**: NPM Audit, Snyk, OWASP Dependency Check" >> $GITHUB_STEP_SUMMARY
+          echo "- **Code Quality**: ESLint, SonarCloud analysis" >> $GITHUB_STEP_SUMMARY
+          echo "- **Coverage Reporting**: Codecov integration" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build Verification**: Application build testing" >> $GITHUB_STEP_SUMMARY
+          echo "- **Performance Testing**: K6 load testing simulation" >> $GITHUB_STEP_SUMMARY
+          echo "- **OWASP ZAP**: Web application security testing" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "🎉 **Pipeline completed successfully!**" >> $GITHUB_STEP_SUMMARY
+          echo "**Pipeline completed successfully!**" >> $GITHUB_STEP_SUMMARY
