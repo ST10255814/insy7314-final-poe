@@ -28,10 +28,15 @@ workflows:
 jobs:
   # Security scanning job
   security-scan:
-    docker:
-      - image: cimg/node:18.17
+    machine:
+      image: ubuntu-2004:2023.07.1
     steps:
       - checkout
+      - run:
+          name: Install Node.js
+          command: |
+            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+            sudo apt-get install -y nodejs
       - run:
           name: Install Dependencies
           command: |
@@ -89,12 +94,24 @@ jobs:
 
   # Backend testing job
   backend-tests:
-    docker:
-      - image: cimg/node:18.17
-      - image: mongo:6.0
-        environment:
-          MONGO_INITDB_DATABASE: test
+    machine:
+      image: ubuntu-2004:2023.07.1
     steps:
+      - checkout
+      - run:
+          name: Install Node.js
+          command: |
+            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+            sudo apt-get install -y nodejs
+      - run:
+          name: Install MongoDB
+          command: |
+            wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
+            echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+            sudo apt-get update
+            sudo apt-get install -y mongodb-org
+            sudo systemctl start mongod
+            sudo systemctl enable mongod
       - checkout
       - run:
           name: Install Backend Dependencies
@@ -121,18 +138,29 @@ jobs:
 
   # SonarCloud analysis job
   sonarcloud-analysis:
-    docker:
-      - image: cimg/node:18.17
+    machine:
+      image: ubuntu-2004:2023.07.1
     steps:
       - checkout
+      - run:
+          name: Install Node.js
+          command: |
+            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+            sudo apt-get install -y nodejs
       - attach_workspace:
           at: .
       - run:
+          name: Install Java 17
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y openjdk-17-jdk
+            java -version
+      - run:
           name: Install SonarScanner
           command: |
-            wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
-            unzip sonar-scanner-cli-4.8.0.2856-linux.zip
-            sudo mv sonar-scanner-4.8.0.2856-linux /opt/sonar-scanner
+            wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
+            unzip sonar-scanner-cli-5.0.1.3006-linux.zip
+            sudo mv sonar-scanner-5.0.1.3006-linux /opt/sonar-scanner
             sudo ln -s /opt/sonar-scanner/bin/sonar-scanner /usr/local/bin/sonar-scanner
       - run:
           name: Run SonarCloud Scan
@@ -148,9 +176,15 @@ jobs:
 
   # Build and deploy job
   build-and-deploy:
-    docker:
-      - image: cimg/node:18.17
+    machine:
+      image: ubuntu-2004:2023.07.1
     steps:
+      - checkout
+      - run:
+          name: Install Node.js
+          command: |
+            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+            sudo apt-get install -y nodejs
       - checkout
       - run:
           name: Build Backend
