@@ -10,3 +10,7 @@ node_modules
 
 # Coverage reports
 backend/coverage/
+frontend/coverage/
+**/coverage/
+*.lcov
+coverage/
