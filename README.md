@@ -2,157 +2,93 @@
 
 # 💰 PayFlow - Secure International Payment Portal
 
-![PayFlow Banner](https://via.placeholder.com/800x200/1e3a8a/ffffff?text=PayFlow+%7C+Secure+Payment+Portal)
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
+![Security](https://img.shields.io/badge/security-A+-green)
+![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen)
+![Node](https://img.shields.io/badge/node-18+-blue)
+![License](https://img.shields.io/badge/license-Academic-orange)
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/ST10255814/insy7314-final-poe)
-[![Security Rating](https://img.shields.io/badge/security-A+-brightgreen)](https://sonarcloud.io/project/overview?id=insy7314-final-poe)
-[![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen)](https://github.com/ST10255814/insy7314-final-poe)
-[![Node Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org/)
-[![License](https://img.shields.io/badge/license-Academic-blue)](LICENSE)
-
-**🏛️ Academic Project** | **🎓 INSY7314** | **🔒 Enterprise Security** | **⚡ MERN Stack**
+**Enterprise-Grade Security** • **MERN Stack** • **Academic Excellence**
 
 </div>
 
 ---
 
-## 🎯 **Project Overview**
+## 🎯 Project Overview
 
-<div align="center">
+PayFlow is a comprehensive secure payment portal designed for international transactions with enterprise-grade security features. This project demonstrates advanced cybersecurity principles including secure authentication, input validation, CSRF protection, and comprehensive security testing.
 
-### 🌟 **Enterprise-Grade Secure Payment Solution**
+**Course:** INSY7314 - Information Systems Security  
+**Institution:** Varsity College (ADvTECH Group)  
+**Year:** 2025
 
-</div>
-
-> **PayFlow** is a comprehensive secure payment portal designed for international transactions with enterprise-grade security features. This project demonstrates advanced cybersecurity principles including secure authentication, input validation, CSRF protection, and comprehensive security testing.
-
-<div align="center">
-
-### 📊 **Tech Stack**
-
-![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)
-![Express.js](https://img.shields.io/badge/Express.js-404D59?style=for-the-badge&logo=express&logoColor=white)
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
-![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens)
-![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
-
-</div>
+### Tech Stack
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=flat&logo=mongodb&logoColor=white)
+![Express.js](https://img.shields.io/badge/Express-000000?style=flat&logo=express&logoColor=white)
+![React](https://img.shields.io/badge/React-61DAFB?style=flat&logo=react&logoColor=black)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat&logo=node.js&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-000000?style=flat&logo=json-web-tokens&logoColor=white)
 
 ---
 
-## 👥 **Meet The Team**
+## 👥 Team Members
 
-<div align="center">
+- **Jayden Larkins** - Team Lead & Full-Stack Development
+- **Gerhard Lemmer** - Backend Architecture & API Development  
+- **Thatho Mokoena** - Frontend Development & UI/UX
+- **Mokran Ait Amara** - Security Testing & DevOps---
 
-| 👨‍💻 **Developer** |
-|:---:|:---:|:---:|
-| **Jayden Larkins** |
-| **Gerhard Lemmer** |
-| **Thatho Mokoena** |
-| **Mokran Ait Amara** |
+## ✨ Key Features
 
-**📅 Project Timeline:** November 2025
-**🏫 Institution:** Varsity College (ADvTECH Group)
+### 🔐 Security Features
+- Multi-layer authentication with JWT tokens
+- CSRF and XSS protection
+- Rate limiting and request monitoring
+- HTTPS enforcement with SSL certificates
+- Input validation and sanitization
 
-</div>
+### ⚡ Technical Features  
+- Real-time payment processing
+- Employee and customer portals
+- Comprehensive test coverage (95%+)
+- Automated CI/CD pipeline
+- SonarCloud integration for code quality
 
----
-
-## ✨ **Key Features & Highlights**
-
-<table>
-<tr>
-<td width="50%">
-
-### 🔐 **Security First**
-- ✅ Multi-layer authentication
-- ✅ CSRF & XSS protection
-- ✅ Rate limiting & monitoring
-- ✅ HTTPS enforcement
-- ✅ JWT with HTTP-only cookies
-
-</td>
-<td width="50%">
-
-### ⚡ **Performance & Quality**
-- ✅ SonarCloud integration
-- ✅ Automated CI/CD pipeline
-- ✅ Real-time monitoring
-
-</td>
-</tr>
-</table>
-
-<div align="center">
-
-### 🌍 **International Payment Processing** | 💳 **Multi-Currency Support** | 📊 **Real-time Analytics**
-
-</div>
+### 🌍 Business Features
+- International payment support
+- Multi-currency transactions
+- SWIFT integration
+- Payment verification system
+- Transaction history and reporting
 
 ---
 
-## 🏗️ **System Architecture**
+## 🏗️ System Architecture
 
-<div align="center">
-
-### 🔄 **MERN Stack Architecture Flow**
-
-```mermaid
-graph TD
-    A[👤 User Interface] --> B[⚛️ React Frontend]
-    B --> C[🌐 Express API]
-    C --> D[🗃️ MongoDB Database]
-    C --> E[🔐 JWT Auth]
-    C --> F[🛡️ Security Middleware]
-    
-    style A fill:#e1f5fe
-    style B fill:#e8f5e8
-    style C fill:#fff3e0
-    style D fill:#f3e5f5
-    style E fill:#ffebee
-    style F fill:#e0f2f1
-```
-
-</div>
-
-<table>
-<tr>
-<td width="50%">
-
-### 🔧 **Backend Structure**
+### Backend Structure
 ```
 backend/
-├── 🔐 auth/           # Authentication & middleware
-├── 🎮 controller/     # API route controllers
-├── 🛡️ middleware/     # Security layers
-├── ⚙️ service/        # Business logic
-├── 🗄️ database/       # MongoDB config
-├── 🔧 utils/          # Validation utilities
-├── 🧪 tests/          # Comprehensive testing
-└── 🚀 server.js       # Application entry
+├── auth/              # Authentication & middleware
+├── controller/        # API route controllers  
+├── middleware/        # Security layers
+├── service/          # Business logic
+├── database/         # MongoDB configuration
+├── utils/            # Validation utilities
+├── tests/            # Comprehensive testing
+└── server.js         # Application entry point
 ```
 
-</td>
-<td width="50%">
-
-### ⚛️ **Frontend Structure**
+### Frontend Structure
 ```
 frontend/
-├── 📱 src/
-│   ├── 🧩 components/    # React components
-│   ├── 📚 lib/          # Axios configuration
-│   ├── 🔧 utils/        # Helper utilities
-│   └── 🎯 App.jsx       # Main application
-├── 🌍 public/           # Static assets
-└── 📦 package.json      # Dependencies
-```
-
-</td>
-</tr>
-</table>
-
----
+├── src/
+│   ├── components/    # React components
+│   ├── lib/          # Axios configuration
+│   ├── utils/        # Helper utilities
+│   └── App.jsx       # Main application
+├── public/           # Static assets
+└── package.json      # Dependencies
+```---
 
 ## 🔒 **Enterprise Security Framework**
 
@@ -641,20 +577,19 @@ npm run analyze        # 📊 Bundle analysis
 
 ---
 
-<div align="center">
-
-## 📄 **License & Usage**
-
-![License](https://img.shields.io/badge/License-Academic_Use_Only-yellow?style=for-the-badge)
-
-**🎓 Academic Project License**
+## 📄 License
 
 This project is developed for educational purposes as part of the INSY7314 course curriculum.
 
-**⚠️ Important Notice**: This project is intended for **academic purposes only** and should not be used in production environments without proper security review and hardening.
+**⚠️ Academic Use Only**: This project is intended for educational purposes and should not be used in production environments without proper security review and hardening.
+
+---
+
+## 🎥 Demo Videos
+
+- **Backend API Walkthrough**: [YouTube Video](https://youtu.be/1fQPPgvUX4Q)  
+- **Frontend Payment Gateway Demo**: [YouTube Video](https://youtu.be/DrvEL8eiAYk)
 
 ---
 
 *Last Updated: November 2025*
-
-</div>
