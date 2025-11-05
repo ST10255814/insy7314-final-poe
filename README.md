@@ -33,10 +33,12 @@ PayFlow is a comprehensive secure payment portal designed for international tran
 
 ## 👥 Team Members
 
-- **Jayden Larkins** - Team Lead & Full-Stack Development
-- **Gerhard Lemmer** - Backend Architecture & API Development  
-- **Thatho Mokoena** - Frontend Development & UI/UX
-- **Mokran Ait Amara** - Security Testing & DevOps---
+- **Jayden Larkins**  
+- **Gerhard Lemmer**   
+- **Thatho Mokoena**  
+- **Mokran Ait Amara**
+
+---
 
 ## ✨ Key Features
 
@@ -64,6 +66,37 @@ PayFlow is a comprehensive secure payment portal designed for international tran
 ---
 
 ## 🏗️ System Architecture
+
+### System Overview
+```mermaid
+graph TB
+    User[👤 User] --> Frontend[⚛️ React Frontend<br/>Port 3000]
+    Frontend --> API[🌐 Express API<br/>Port 5000]
+    API --> DB[(🗃️ MongoDB<br/>Database)]
+    API --> Auth[🔐 JWT Auth<br/>Middleware]
+    API --> Security[🛡️ Security<br/>Layer]
+    
+    subgraph "Frontend Layer"
+        Frontend
+    end
+    
+    subgraph "Backend Layer"
+        API
+        Auth
+        Security
+    end
+    
+    subgraph "Data Layer"
+        DB
+    end
+    
+    style User fill:#4f46e5,stroke:#1e1b4b,stroke-width:2px,color:#fff
+    style Frontend fill:#06b6d4,stroke:#0e7490,stroke-width:2px,color:#fff
+    style API fill:#10b981,stroke:#047857,stroke-width:2px,color:#fff
+    style DB fill:#f59e0b,stroke:#d97706,stroke-width:2px,color:#fff
+    style Auth fill:#ef4444,stroke:#dc2626,stroke-width:2px,color:#fff
+    style Security fill:#8b5cf6,stroke:#7c3aed,stroke-width:2px,color:#fff
+```
 
 ### Backend Structure
 ```
@@ -161,136 +194,79 @@ frontend/
 
 ---
 
-## 📡 **API Documentation**
+## 📡 API Documentation
 
-<div align="center">
-
-### 🔌 **RESTful API Endpoints**
-
-![API](https://img.shields.io/badge/API-RESTful-blue?style=for-the-badge)
-![Swagger](https://img.shields.io/badge/Docs-Interactive-green?style=for-the-badge)
-
-</div>
-
-<table>
-<tr>
-<td width="33%">
-
-### 🔐 **Authentication**
+### Authentication Endpoints
 ```http
-POST /auth/register
-POST /auth/login
-POST /auth/logout
-GET  /auth/verify
+POST /auth/register    # User registration
+POST /auth/login      # User authentication
+POST /auth/logout     # Secure logout
+GET  /auth/verify     # Token verification
 ```
 
-</td>
-<td width="33%">
-
-### 💳 **Payment Management**
+### Payment Management
 ```http
-GET  /api/payments
-POST /api/payments
-GET  /api/payments/:id
-PUT  /api/payments/:id
+GET  /api/payments         # Retrieve user payments
+POST /api/payments         # Create new payment
+GET  /api/payments/:id     # Get specific payment
+PUT  /api/payments/:id     # Update payment status
 ```
 
-</td>
-<td width="33%">
-
-### 👨‍💼 **Employee Portal**
+### Employee Portal
 ```http
-GET /api/employee/payments
-PUT /api/employee/payments/:id/verify
-GET /api/employee/dashboard
-```
+GET /api/employee/payments           # View all payments (admin)
+PUT /api/employee/payments/:id/verify # Verify payment
+GET /api/employee/dashboard          # Employee dashboard data
+```---
 
-</td>
-</tr>
-</table>
+## 🚀 Quick Start
 
----
+### Prerequisites
+- **Node.js** v18 or higher
+- **MongoDB** (local or cloud instance)
+- **Git** for version control
 
-## 🚀 **Quick Start Guide**
+### Installation
 
-<div align="center">
-
-### ⚡ **Get Started in 5 Minutes**
-
-![Setup](https://img.shields.io/badge/Setup_Time-5_Minutes-brightgreen?style=for-the-badge)
-
-</div>
-
-### 📋 **Prerequisites**
-
-<div align="center">
-
-![Node.js](https://img.shields.io/badge/Node.js-v18+-brightgreen?logo=node.js)
-![MongoDB](https://img.shields.io/badge/MongoDB-v6+-green?logo=mongodb)
-![Git](https://img.shields.io/badge/Git-Latest-orange?logo=git)
-
-</div>
-
-### 🔧 **Installation Steps**
-
-#### **Step 1: Clone Repository**
+1. **Clone the repository**
 ```bash
 git clone https://github.com/ST10255814/insy7314-final-poe.git
 cd insy7314-final-poe
 ```
 
-#### **Step 2: Backend Setup**
+2. **Setup Backend**
 ```bash
 cd backend
 npm install
-# Configure your .env file
+# Configure environment variables
 cp .env.example .env
 ```
 
-#### **Step 3: Frontend Setup**
+3. **Setup Frontend**
 ```bash
 cd ../frontend
 npm install
 ```
 
-#### **Step 4: Launch Application**
+4. **Start Development Servers**
 
-<table>
-<tr>
-<td width="50%">
-
-**🔧 Backend Server**
+**Backend (Terminal 1):**
 ```bash
 cd backend
 npm run dev
+# Server runs on https://localhost:5000
 ```
-🌐 **API**: `https://localhost:5000`
 
-</td>
-<td width="50%">
-
-**⚛️ Frontend Application**
+**Frontend (Terminal 2):**
 ```bash
-cd frontend  
+cd frontend
 npm start
+# Application runs on https://localhost:3000
 ```
-🖥️ **Web App**: `https://localhost:3000`
 
-</td>
-</tr>
-</table>
-
-<div align="center">
-
-### 🎉 **You're Ready to Go!**
-
-**🔐 Default Employee Login:**
-- **Username:** `bank_employee`
-- **Password:** `Employee@123`
-
-</div>
-
-### 🌐 **Browser Setup for Development**
+### Default Login Credentials
+- **Employee Username:** `bank_employee`
+- **Employee Password:** `Employee@123`### 🌐 **Browser Setup for Development**
 <details>
 <summary>Click to expand browser configuration for self-signed certificates</summary>
 
@@ -376,18 +352,53 @@ npm run lint:security    # 🛡️ ESLint rules
 
 ```mermaid
 graph LR
-    A[📝 Code Push] --> B[🔍 Security Scan]
-    B --> C[🧪 Run Tests]
-    C --> D[📊 Quality Gate]
-    D --> E[🏗️ Build]
-    E --> F[🚀 Deploy]
+    A[📝 Code Push<br/>GitHub] --> B[🔍 Security Scan<br/>OWASP & Snyk]
+    B --> C[🧪 Run Tests<br/>Jest & Coverage]
+    C --> D[📊 Quality Gate<br/>SonarCloud]
+    D --> E[🏗️ Build<br/>React & Node]
+    E --> F[🚀 Deploy<br/>Production]
     
-    style A fill:#e1f5fe
-    style B fill:#ffebee
-    style C fill:#e8f5e8
-    style D fill:#fff3e0
-    style E fill:#f3e5f5
-    style F fill:#e0f2f1
+    style A fill:#1e40af,stroke:#1e3a8a,stroke-width:3px,color:#fff
+    style B fill:#dc2626,stroke:#b91c1c,stroke-width:3px,color:#fff
+    style C fill:#059669,stroke:#047857,stroke-width:3px,color:#fff
+    style D fill:#d97706,stroke:#b45309,stroke-width:3px,color:#fff
+    style E fill:#7c3aed,stroke:#6d28d9,stroke-width:3px,color:#fff
+    style F fill:#0891b2,stroke:#0e7490,stroke-width:3px,color:#fff
+```
+
+### DevOps Workflow Details
+```mermaid
+graph TB
+    subgraph "Development"
+        Dev[👨‍💻 Developer] --> Commit[📝 Git Commit]
+        Commit --> Push[⬆️ Push to GitHub]
+    end
+    
+    subgraph "CI Pipeline"
+        Push --> Trigger[🔔 Trigger Actions]
+        Trigger --> Security[🛡️ Security Scan]
+        Trigger --> Tests[🧪 Unit Tests]
+        Trigger --> Integration[🔗 Integration Tests]
+        Security --> Quality[📊 Code Quality]
+        Tests --> Quality
+        Integration --> Quality
+    end
+    
+    subgraph "CD Pipeline"
+        Quality --> Build[🏗️ Build Application]
+        Build --> Deploy[🚀 Deploy to Staging]
+        Deploy --> Verify[✅ Verify Deployment]
+        Verify --> Prod[🌍 Production Release]
+    end
+    
+    style Dev fill:#4f46e5,stroke:#1e1b4b,stroke-width:2px,color:#fff
+    style Security fill:#dc2626,stroke:#b91c1c,stroke-width:2px,color:#fff
+    style Tests fill:#059669,stroke:#047857,stroke-width:2px,color:#fff
+    style Integration fill:#0891b2,stroke:#0e7490,stroke-width:2px,color:#fff
+    style Quality fill:#d97706,stroke:#b45309,stroke-width:2px,color:#fff
+    style Build fill:#7c3aed,stroke:#6d28d9,stroke-width:2px,color:#fff
+    style Deploy fill:#10b981,stroke:#047857,stroke-width:2px,color:#fff
+    style Prod fill:#f59e0b,stroke:#d97706,stroke-width:2px,color:#fff
 ```
 
 <table>
@@ -507,7 +518,7 @@ npm run analyze        # 📊 Bundle analysis
 
 <div align="center">
 
-### � **Video Demonstrations**
+### ▶️ **Video Demonstrations**
 
 [![YouTube](https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtube.com)
 
@@ -544,39 +555,6 @@ npm run analyze        # 📊 Bundle analysis
 
 ---
 
-## 📞 **Support & Contact**
-
-<div align="center">
-
-### 🤝 **Get Help & Contribute**
-
-</div>
-
-<table>
-<tr>
-<td width="50%">
-
-### 👨‍💻 **Team Support**
-- 🔐 **Security Concerns**: Contact team leads
-- 📖 **Documentation**: Check project wiki
-- 🐛 **Bug Reports**: Create GitHub issues
-- 💡 **Feature Requests**: Use discussion board
-
-</td>
-<td width="50%">
-
-### 🎓 **Academic Information**
-- 📚 **Course**: INSY7314 - Information Systems Security
-- 🏫 **Institution**: Varsity College (ADvTECH Group)
-- 📅 **Academic Year**: 2025
-- 📋 **Project Type**: Final Portfolio of Evidence
-
-</td>
-</tr>
-</table>
-
----
-
 ## 📄 License
 
 This project is developed for educational purposes as part of the INSY7314 course curriculum.
@@ -585,11 +563,5 @@ This project is developed for educational purposes as part of the INSY7314 cours
 
 ---
 
-## 🎥 Demo Videos
-
-- **Backend API Walkthrough**: [YouTube Video](https://youtu.be/1fQPPgvUX4Q)  
-- **Frontend Payment Gateway Demo**: [YouTube Video](https://youtu.be/DrvEL8eiAYk)
-
----
 
 *Last Updated: November 2025*
