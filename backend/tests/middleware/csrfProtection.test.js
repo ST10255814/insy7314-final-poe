@@ -161,7 +161,7 @@ describe('CSRF Protection Middleware', () => {
     it('should prefer header token over body token', () => {
       const correctToken = 'correct-token';
       const wrongToken = 'wrong-token';
-      
+
       req.cookies['csrf-token'] = correctToken;
       req.headers['x-csrf-token'] = correctToken;
       req.body._csrf = wrongToken;
