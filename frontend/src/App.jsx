@@ -5,7 +5,10 @@ import Login from './components/Login.jsx'
 import Register from './components/Register.jsx';
 import PastPayments from './components/PastPayments.jsx';
 import CreatePayment from './components/CreatePayment.jsx';
+import EmployeeDashboard from './components/EmployeeDashboard.jsx';
+import SubmittedPayments from './components/SubmittedPayments.jsx';
 import Navbar from './components/Navbar.jsx';
+import EmployeeRoute, { CustomerRoute } from './components/EmployeeRoute.jsx';
 import { ToastContainer } from 'react-toastify';
 import Home from './components/Home.jsx';
 import api from './lib/axios.js';
@@ -33,8 +36,30 @@ function App() {
         <Route path='/' element={<Home/>} />
         <Route path='/login' element={<Login/>} />
         <Route path='/register' element={<Register/>} />
-        <Route path='/pastPayments' element={<PastPayments/>} />
-        <Route path='/createPayment' element={<CreatePayment/>} />
+        
+        {/* Customer Routes - Protected */}
+        <Route path='/pastPayments' element={
+          <CustomerRoute>
+            <PastPayments/>
+          </CustomerRoute>
+        } />
+        <Route path='/createPayment' element={
+          <CustomerRoute>
+            <CreatePayment/>
+          </CustomerRoute>
+        } />
+        
+        {/* Employee Routes - Protected */}
+        <Route path='/employee/dashboard' element={
+          <EmployeeRoute>
+            <EmployeeDashboard/>
+          </EmployeeRoute>
+        } />
+        <Route path='/employee/submitted' element={
+          <EmployeeRoute>
+            <SubmittedPayments/>
+          </EmployeeRoute>
+        } />
       </Routes>
       <ToastContainer />
     </Router>

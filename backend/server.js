@@ -9,6 +9,8 @@ const cookieParser = require('cookie-parser')
 
 const { connectMongo } = require('./database/db')
 const userRoutes = require('./auth/user')
+const employeeRoutes = require('./auth/employee')
+const { setupEmployees } = require('./scripts/setupEmployees')
 const { setCSRFToken, getCSRFToken } = require('./middleware/csrfProtection')
 const { apiCSP } = require('./middleware/strictCSP')
 
@@ -137,9 +139,17 @@ app.get('/', (_, res) => {
 });
 
 app.use(userRoutes) //User endpoints
+app.use(employeeRoutes) //Employee endpoints
 
 //Initiate connection to mongoDB
-connectMongo()
+connectMongo().then(async () => {
+    // Setup employee accounts after database connection
+    try {
+        await setupEmployees();
+    } catch (error) {
+        console.error('Failed to setup employees:', error.message);
+    }
+})
 
 //Start the HTTPS server
 httpsServer.listen(PORT, () => {

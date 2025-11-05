@@ -50,10 +50,17 @@ export default function Login() {
         await new Promise((resolve) => setTimeout(resolve, 3000));
         const res = await api.post("/api/login", data);
         sessionStorage.setItem("user", JSON.stringify(res.data.user.fullName));
+        sessionStorage.setItem("userRole", res.data.user.role || "Customer");
 
         setLoading(false);
         showSuccessToast(res.data.message || "Login Successful");
-        navigate("/pastPayments");
+        
+        // Role-based redirection
+        if (res.data.user.role === "Employee") {
+          navigate("/employee/dashboard");
+        } else {
+          navigate("/pastPayments");
+        }
       }
     } catch (err) {
       showErrorToast(err.response?.data?.error || "Login failed");

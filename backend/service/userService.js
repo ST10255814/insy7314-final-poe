@@ -35,9 +35,13 @@ async function loginUser(data) {
         const accountNumberMatch = await bcrypt.compare(safeAccountNumber, existingUser.accountNumber)
         if(!accountNumberMatch) throw new Error('Invalid credentials')
 
-        // Generate JWT token
+        // Generate JWT token with role information
         const token = jwt.sign(
-            { id: existingUser._id, username: existingUser.username },
+            { 
+                id: existingUser._id, 
+                username: existingUser.username, 
+                role: existingUser.role || 'Customer' 
+            },
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
@@ -47,6 +51,7 @@ async function loginUser(data) {
             id: existingUser._id,
             username: existingUser.username,
             fullName: existingUser.fullName,
+            role: existingUser.role || 'Customer',
             token
         };
 

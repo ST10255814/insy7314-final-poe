@@ -15,6 +15,7 @@ import { showErrorToast, showSuccessToast } from "../utils/toastHelper";
 export default function Navbar() {
   const navigate = useNavigate();
   const user = JSON.parse(sessionStorage.getItem("user"));
+  const userRole = sessionStorage.getItem("userRole");
 
   const handleLogout = async () => {
     try {
@@ -69,44 +70,89 @@ export default function Navbar() {
         </h1>
         {user && (
           <div className="flex flex-wrap justify-center space-x-3 sm:space-x-6 sm:absolute sm:left-1/2 sm:transform sm:-translate-x-1/2 text-sm sm:text-base lg:text-lg">
-            <NavLink
-              to="/pastPayments"
-              className={({ isActive }) =>
-                `flex items-center space-x-1 relative group transition transform hover:scale-105 ${
-                  isActive ? activeTextClass : normalTextClass
-                }`
-              }
-            >
-              <FaHistory
-                className={
-                  window.location.pathname === "/pastPayments"
-                    ? activeIconClass
-                    : normalIconClass
-                }
-              />
-              <span className="hidden sm:inline">Past Payments</span>
-              <span className="sm:hidden">Payments</span>
-              <span className={getUnderlineClass("/pastPayments")}></span>
-            </NavLink>
-            <NavLink
-              to="/createPayment"
-              className={({ isActive }) =>
-                `flex items-center space-x-1 relative group transition transform hover:scale-105 ${
-                  isActive ? activeTextClass : normalTextClass
-                }`
-              }
-            >
-              <FaMoneyCheckAlt
-                className={
-                  window.location.pathname === "/createPayment"
-                    ? activeIconClass
-                    : normalIconClass
-                }
-              />
-              <span className="hidden sm:inline">Make a Payment</span>
-              <span className="sm:hidden">Pay</span>
-              <span className={getUnderlineClass("/createPayment")}></span>
-            </NavLink>
+            {userRole === "Employee" ? (
+              <>
+                <NavLink
+                  to="/employee/dashboard"
+                  className={({ isActive }) =>
+                    `flex items-center space-x-1 relative group transition transform hover:scale-105 ${
+                      isActive ? activeTextClass : normalTextClass
+                    }`
+                  }
+                >
+                  <FaHistory
+                    className={
+                      window.location.pathname === "/employee/dashboard"
+                        ? activeIconClass
+                        : normalIconClass
+                    }
+                  />
+                  <span className="hidden sm:inline">Pending Payments</span>
+                  <span className="sm:hidden">Pending</span>
+                  <span className={getUnderlineClass("/employee/dashboard")}></span>
+                </NavLink>
+                <NavLink
+                  to="/employee/submitted"
+                  className={({ isActive }) =>
+                    `flex items-center space-x-1 relative group transition transform hover:scale-105 ${
+                      isActive ? activeTextClass : normalTextClass
+                    }`
+                  }
+                >
+                  <FaMoneyCheckAlt
+                    className={
+                      window.location.pathname === "/employee/submitted"
+                        ? activeIconClass
+                        : normalIconClass
+                    }
+                  />
+                  <span className="hidden sm:inline">Submitted Payments</span>
+                  <span className="sm:hidden">Submitted</span>
+                  <span className={getUnderlineClass("/employee/submitted")}></span>
+                </NavLink>
+              </>
+            ) : (
+              <>
+                <NavLink
+                  to="/pastPayments"
+                  className={({ isActive }) =>
+                    `flex items-center space-x-1 relative group transition transform hover:scale-105 ${
+                      isActive ? activeTextClass : normalTextClass
+                    }`
+                  }
+                >
+                  <FaHistory
+                    className={
+                      window.location.pathname === "/pastPayments"
+                        ? activeIconClass
+                        : normalIconClass
+                    }
+                  />
+                  <span className="hidden sm:inline">Past Payments</span>
+                  <span className="sm:hidden">Payments</span>
+                  <span className={getUnderlineClass("/pastPayments")}></span>
+                </NavLink>
+                <NavLink
+                  to="/createPayment"
+                  className={({ isActive }) =>
+                    `flex items-center space-x-1 relative group transition transform hover:scale-105 ${
+                      isActive ? activeTextClass : normalTextClass
+                    }`
+                  }
+                >
+                  <FaMoneyCheckAlt
+                    className={
+                      window.location.pathname === "/createPayment"
+                        ? activeIconClass
+                        : normalIconClass
+                    }
+                  />
+                  <span className="hidden sm:inline">Make a Payment</span>
+                  <span className="sm:hidden">Pay</span>
+                  <span className={getUnderlineClass("/createPayment")}></span>
+                </NavLink>
+              </>
+            )}
           </div>
         )}
         <div className="flex items-center space-x-2 sm:space-x-4 sm:pr-4 text-sm sm:text-base lg:text-lg">

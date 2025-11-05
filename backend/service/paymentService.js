@@ -76,4 +76,159 @@ async function CreatePayment(user, data) {
     }
 }
 
-module.exports = { getAllPayments, CreatePayment };
+async function getPendingPayments() {
+    try {
+        const db = client.db('INSY7314-POE');
+        const PaymentsCollection = db.collection('Payments');
+        const UsersCollection = db.collection('Users');
+        
+        // Get all payments with pending status
+        const pendingPayments = await PaymentsCollection.find({ status: 'pending' }).toArray();
+        
+        // Enrich with user information
+        const enrichedPayments = await Promise.all(
+            pendingPayments.map(async (payment) => {
+                const user = await UsersCollection.findOne({ _id: payment.userId });
+                return {
+                    ...payment,
+                    customerName: user ? user.fullName : 'Unknown Customer',
+                    customerUsername: user ? user.username : 'Unknown'
+                };
+            })
+        );
+        
+        console.log(`Found ${enrichedPayments.length} pending payments`);
+        return enrichedPayments;
+    } catch (error) {
+        console.error(`Error fetching pending payments: ${error.message}`);
+        throw new Error('Error fetching pending payments');
+    }
+}
+
+async function verifySwiftCode(paymentId, swiftCode) {
+    try {
+        const db = client.db('INSY7314-POE');
+        const PaymentsCollection = db.collection('Payments');
+        
+        // Get the payment
+        const payment = await PaymentsCollection.findOne({ _id: toObjectId(paymentId) });
+        if (!payment) {
+            throw new Error('Payment not found');
+        }
+        
+        if (payment.status !== 'pending') {
+            throw new Error('Payment is not in pending status');
+        }
+        
+        // Validate SWIFT code format (basic validation)
+        const swiftCodePattern = /^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/;
+        if (!swiftCodePattern.test(swiftCode)) {
+            throw new Error('Invalid SWIFT code format');
+        }
+        
+        // Check if provided SWIFT code matches the one in payment
+        if (payment.accountInformation.swiftCode !== swiftCode) {
+            throw new Error('SWIFT code does not match payment information');
+        }
+        
+        // Update payment status to verified
+        const result = await PaymentsCollection.updateOne(
+            { _id: toObjectId(paymentId) },
+            { 
+                $set: { 
+                    status: 'verified',
+                    verifiedAt: new Date(),
+                    verifiedSwiftCode: swiftCode
+                }
+            }
+        );
+        
+        if (result.matchedCount === 0) {
+            throw new Error('Payment not found');
+        }
+        
+        console.log(`Payment ${paymentId} SWIFT code verified successfully`);
+        return { message: 'SWIFT code verified successfully', status: 'verified' };
+    } catch (error) {
+        console.error(`Error verifying SWIFT code: ${error.message}`);
+        throw error;
+    }
+}
+
+async function submitToSwift(paymentId, employee) {
+    try {
+        const db = client.db('INSY7314-POE');
+        const PaymentsCollection = db.collection('Payments');
+        
+        // Get the payment
+        const payment = await PaymentsCollection.findOne({ _id: toObjectId(paymentId) });
+        if (!payment) {
+            throw new Error('Payment not found');
+        }
+        
+        if (payment.status !== 'verified') {
+            throw new Error('Payment must be verified before submission to SWIFT');
+        }
+        
+        // Simulate SWIFT submission (in real world, this would be an API call to SWIFT network)
+        const swiftTransactionId = `SWIFT${Date.now()}${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
+        
+        // Update payment status to submitted
+        const result = await PaymentsCollection.updateOne(
+            { _id: toObjectId(paymentId) },
+            { 
+                $set: { 
+                    status: 'submitted',
+                    submittedAt: new Date(),
+                    submittedBy: employee.username,
+                    swiftTransactionId: swiftTransactionId
+                }
+            }
+        );
+        
+        if (result.matchedCount === 0) {
+            throw new Error('Payment not found');
+        }
+        
+        console.log(`Payment ${paymentId} submitted to SWIFT successfully with transaction ID: ${swiftTransactionId}`);
+        return { 
+            message: 'Payment submitted to SWIFT successfully', 
+            status: 'submitted',
+            swiftTransactionId: swiftTransactionId
+        };
+    } catch (error) {
+        console.error(`Error submitting to SWIFT: ${error.message}`);
+        throw error;
+    }
+}
+
+async function getSubmittedPayments() {
+    try {
+        const db = client.db('INSY7314-POE');
+        const PaymentsCollection = db.collection('Payments');
+        const UsersCollection = db.collection('Users');
+        
+        // Get all payments with submitted status
+        const submittedPayments = await PaymentsCollection.find({ status: 'submitted' }).toArray();
+        
+        // Enrich with user information
+        const enrichedPayments = await Promise.all(
+            submittedPayments.map(async (payment) => {
+                const user = await UsersCollection.findOne({ _id: payment.userId });
+                return {
+                    ...payment,
+                    customerName: user ? user.fullName : 'Unknown Customer',
+                    customerUsername: user ? user.username : 'Unknown'
+                };
+            })
+        );
+        
+        console.log(`Found ${enrichedPayments.length} submitted payments`);
+        return enrichedPayments;
+    } catch (error) {
+        console.error(`Error fetching submitted payments: ${error.message}`);
+        throw new Error('Error fetching submitted payments');
+    }
+}
+
+module.exports = { getAllPayments, CreatePayment, getPendingPayments, verifySwiftCode, submitToSwift, getSubmittedPayments };
