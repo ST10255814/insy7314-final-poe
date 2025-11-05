@@ -264,7 +264,7 @@ async function markPaymentAsSentToSwift(paymentId) {
     return { message: 'Payment successfully sent to SWIFT portal', status: 'submitted' };
   }catch(error){
     console.error(`Error marking payment as sent to SWIFT: ${error.message}`);
-    throw new Error('Error marking payment as sent to SWIFT');
+    throw error; // Re-throw the original error instead of creating a generic one
   }
 }
 

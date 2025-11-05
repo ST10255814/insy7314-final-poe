@@ -15,19 +15,23 @@ jest.mock('../../database/db', () => ({
 }));
 
 describe('PaymentService', () => {
-  let client;
   let db;
   let paymentsCollection;
   let usersCollection;
+  let mockClient;
 
   beforeEach(() => {
+    // Get the mocked client
+    mockClient = require('../../database/db').client;
+
     // Set up mocks for each test
     paymentsCollection = {
       find: jest.fn(),
       findOne: jest.fn(),
       insertOne: jest.fn(),
       updateOne: jest.fn(),
-      deleteMany: jest.fn()
+      deleteMany: jest.fn(),
+      toArray: jest.fn()
     };
 
     usersCollection = {
@@ -42,12 +46,8 @@ describe('PaymentService', () => {
       })
     };
 
-    client = {
-      db: jest.fn(() => db)
-    };
-
-    // Mock the client from the db module
-    require('../../database/db').client = client;
+    // Set up the mock client to return our mocked db
+    mockClient.db.mockReturnValue(db);
   });
 
   afterEach(() => {
@@ -127,7 +127,7 @@ describe('PaymentService', () => {
       };
 
       await expect(CreatePayment(mockUser, invalidPaymentData))
-        .rejects.toThrow('Invalid currency');
+        .rejects.toThrow('Invalid Currency format');
     });
   });
 

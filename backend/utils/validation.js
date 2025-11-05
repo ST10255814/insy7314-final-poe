@@ -9,7 +9,7 @@ const VALIDATION_PATTERNS = {
   IDNUMBER: /^\d{13}$/,
   ACCOUNTNUMBER: /^[0-9]{8,12}$/,
   USERNAME: /^[a-zA-Z][a-zA-Z0-9_]{4,15}$/,
-  FULLNAME: /^[a-zA-Z\s]{2,50}$/,
+  FULLNAME: /^[a-zA-Z\s&;amp]{2,50}$/,
 
   // Payment fields
   SWIFTCODE: /^[A-Za-z]{6}[A-Za-z0-9]{2}[A-Za-z0-9]{0,3}$/,
@@ -18,7 +18,8 @@ const VALIDATION_PATTERNS = {
   ACCOUNTHOLDERNAME: /^[a-zA-Z\s]{2,50}$/,
   SERVICEPROVIDER: /^[a-zA-Z0-9\s&.-]{2,50}$/,
   CURRENCY: /^(USD|EUR|GBP|ZAR)$/,
-  AMOUNT: /^\d+\.?\d{0,2}$/
+  // eslint-disable-next-line security/detect-unsafe-regex
+  AMOUNT: /^\d+(\.\d{1,2})?$/
 };
 
 // XSS prevention functions
@@ -34,13 +35,16 @@ function validateAndSanitize(field, value, pattern) {
     throw new Error(`${field} is required`);
   }
 
-  // Convert to string and sanitize
-  const sanitizedValue = sanitizeInput(String(value));
+  // Convert to string
+  const stringValue = String(value);
 
-  // Check for potential XSS patterns
-  if (containsXSSPatterns(sanitizedValue)) {
+  // Check for potential XSS patterns BEFORE sanitization
+  if (containsXSSPatterns(stringValue)) {
     throw new Error(`${field} contains invalid characters`);
   }
+
+  // Sanitize the input
+  const sanitizedValue = sanitizeInput(stringValue);
 
   // Validate against pattern
   if (pattern && !pattern.test(sanitizedValue)) {
