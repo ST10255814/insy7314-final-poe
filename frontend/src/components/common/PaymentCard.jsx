@@ -19,7 +19,7 @@ export default function PaymentCard({ payment, index }) {
           className={`px-3 py-1 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap ${
             payment.status === "pending"
               ? "bg-yellow-100 text-yellow-800"
-              : payment.status === "completed"
+              : payment.status === "verified"
               ? "bg-green-100 text-green-800"
               : "bg-gray-100 text-gray-800"
           }`}

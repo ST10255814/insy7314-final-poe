@@ -1,8 +1,12 @@
 import { useState, useEffect } from "react";
 import api from "../lib/axios";
-import { FaEye, FaCheck, FaSpinner, FaExclamationTriangle } from "react-icons/fa";
 import { showErrorToast, showSuccessToast } from "../utils/toastHelper";
-import LoadingButton from "./common/LoadingButton";
+import {
+  EmployeePaymentCard,
+  EmployeeLoadingState,
+  EmployeeEmptyState,
+  BackgroundBlobs
+} from "./common";
 
 export default function EmployeeDashboard() {
   const [pendingPayments, setPendingPayments] = useState([]);
@@ -37,9 +41,9 @@ export default function EmployeeDashboard() {
       showSuccessToast(response.data.message);
       
       // Update the payment status in the local state
-      setPendingPayments(prev => 
-        prev.map(payment => 
-          payment._id === paymentId 
+      setPendingPayments(prev =>
+        prev.map(payment =>
+          payment._id === paymentId
             ? { ...payment, status: 'verified' }
             : payment
         )
@@ -72,124 +76,52 @@ export default function EmployeeDashboard() {
     }
   };
 
-  const formatAmount = (amount, currency) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency || 'USD'
-    }).format(amount);
-  };
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center pt-20">
-        <div className="text-center">
-          <FaSpinner className="animate-spin text-4xl text-[#007768] mx-auto mb-4" />
-          <p className="text-gray-600">Loading pending payments...</p>
-        </div>
-      </div>
-    );
+    return <EmployeeLoadingState />;
+  }
+
+  if (pendingPayments.length === 0) {
+    return <EmployeeEmptyState />;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 pt-20 px-4">
-      <div className="max-w-6xl mx-auto py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Employee Dashboard</h1>
-          <p className="text-gray-600">Review and process international payments</p>
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-gray-50 via-[#d9f3f0] to-[#e6f7f5] pt-20 px-4 sm:px-6 pb-8">
+      <BackgroundBlobs />
+      
+      <div className="relative z-10 max-w-6xl mx-auto py-6 sm:py-8">
+        {/* Page Header */}
+        <div className="text-center mb-8 sm:mb-12">
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-lg border border-[#007768]/30 p-6 sm:p-8 mx-auto max-w-2xl">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#007768] mb-2 sm:mb-4 drop-shadow-sm">
+              Employee Dashboard
+            </h1>
+            <p className="text-gray-700 text-base sm:text-lg leading-relaxed">
+              Review and process international payments with{" "}
+              <span className="font-semibold text-[#007768]">secure verification</span>{" "}
+              and SWIFT integration
+            </p>
+            <div className="mt-4 px-4 py-2 bg-[#007768]/10 rounded-lg border border-[#007768]/20">
+              <p className="text-sm text-[#007768] font-medium">
+                {pendingPayments.length} payment{pendingPayments.length !== 1 ? 's' : ''} awaiting your review
+              </p>
+            </div>
+          </div>
         </div>
 
-        {pendingPayments.length === 0 ? (
-          <div className="text-center py-12">
-            <FaCheck className="text-6xl text-green-500 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">No Pending Payments</h3>
-            <p className="text-gray-500">All payments have been processed</p>
-          </div>
-        ) : (
-          <div className="grid gap-6">
-            {pendingPayments.map((payment) => (
-              <div key={payment._id} className="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
-                <div className="grid md:grid-cols-2 gap-6">
-                  {/* Payment Information */}
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                      <FaEye className="mr-2 text-[#007768]" />
-                      Payment Details
-                    </h3>
-                    <div className="space-y-2 text-sm">
-                      <p><span className="font-medium">Customer:</span> {payment.customerName}</p>
-                      <p><span className="font-medium">Username:</span> {payment.customerUsername}</p>
-                      <p><span className="font-medium">Amount:</span> {formatAmount(payment.amount, payment.currency)}</p>
-                      <p><span className="font-medium">Service Provider:</span> {payment.serviceProvider}</p>
-                      <p><span className="font-medium">Created:</span> {formatDate(payment.createdAt)}</p>
-                      <p className="flex items-center">
-                        <span className="font-medium">Status:</span>
-                        <span className={`ml-2 px-2 py-1 rounded text-xs ${
-                          payment.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                          payment.status === 'verified' ? 'bg-green-100 text-green-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
-                          {payment.status}
-                        </span>
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Account Information */}
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Account Information</h3>
-                    <div className="space-y-2 text-sm">
-                      <p><span className="font-medium">Account Holder:</span> {payment.accountInformation.accountHolderName}</p>
-                      <p><span className="font-medium">Branch Code:</span> {payment.accountInformation.branchCode}</p>
-                      <p><span className="font-medium">Account Type:</span> {payment.accountInformation.accountType}</p>
-                      <p><span className="font-medium">SWIFT Code:</span> 
-                        <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded font-mono text-xs">
-                          {payment.accountInformation.swiftCode}
-                        </span>
-                      </p>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="mt-6 space-y-3">
-                      {payment.status === 'pending' && (
-                        <LoadingButton
-                          loading={verifyingSwift[payment._id]}
-                          loadingText="Verifying..."
-                          onClick={() => verifySwiftCode(payment._id, payment.accountInformation.swiftCode)}
-                          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg flex items-center justify-center"
-                        >
-                          <FaCheck className="mr-2" />
-                          Verify SWIFT Code
-                        </LoadingButton>
-                      )}
-                      
-                      {payment.status === 'verified' && (
-                        <LoadingButton
-                          loading={submittingSwift[payment._id]}
-                          loadingText="Submitting..."
-                          onClick={() => submitToSwift(payment._id)}
-                          className="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg flex items-center justify-center"
-                        >
-                          <FaExclamationTriangle className="mr-2" />
-                          Submit to SWIFT
-                        </LoadingButton>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        {/* Payments Grid */}
+        <div className="grid gap-4 sm:gap-6">
+          {pendingPayments.map((payment, index) => (
+            <EmployeePaymentCard
+              key={payment._id}
+              payment={payment}
+              index={index}
+              verifyingSwift={verifyingSwift}
+              submittingSwift={submittingSwift}
+              onVerifySwift={verifySwiftCode}
+              onSubmitToSwift={submitToSwift}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
