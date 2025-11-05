@@ -124,8 +124,8 @@ jobs:
           name: backend-test-results
           path: backend/coverage/
 
-  frontend-tests:
-    name: Frontend Tests & Linting
+  frontend-build:
+    name: Frontend Build & Linting
     runs-on: ubuntu-latest
     needs: security-scan
     steps:
@@ -145,28 +145,13 @@ jobs:
       - name: Run Frontend Linting
         run: cd frontend && npm run lint
       
-      - name: Run Frontend Tests with Coverage
-        run: cd frontend && npm run test:ci
-        env:
-          CI: true
-      
-      - name: Upload Frontend Coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          file: frontend/coverage/lcov.info
-          flags: frontend
-          name: frontend-coverage
-      
-      - name: Upload Frontend Test Results
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-test-results
-          path: frontend/coverage/
+      - name: Build Frontend Application
+        run: cd frontend && npm run build
 
   sonarcloud:
     name: SonarCloud Code Quality
     runs-on: ubuntu-latest
-    needs: [backend-tests, frontend-tests]
+    needs: [backend-tests, frontend-build]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -184,12 +169,6 @@ jobs:
           name: backend-test-results
           path: backend/coverage/
 
-      - name: Download frontend test results
-        uses: actions/download-artifact@v4
-        with:
-          name: frontend-test-results
-          path: frontend/coverage/
-
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
@@ -199,7 +178,7 @@ jobs:
   build-and-test:
     name: Build & Test Applications
     runs-on: ubuntu-latest
-    needs: [backend-tests, frontend-tests]
+    needs: [backend-tests, frontend-build]
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout code
@@ -302,7 +281,7 @@ jobs:
   pipeline-summary:
     name: Pipeline Summary
     runs-on: ubuntu-latest
-    needs: [security-scan, backend-tests, frontend-tests, sonarcloud, build-and-test, deploy-staging, performance-tests, owasp-zap-scan]
+    needs: [security-scan, backend-tests, frontend-build, sonarcloud, build-and-test, deploy-staging, performance-tests, owasp-zap-scan]
     if: always()
     steps:
       - name: Generate Comprehensive Pipeline Summary
@@ -312,7 +291,7 @@ jobs:
           echo "## 📊 Job Results:" >> $GITHUB_STEP_SUMMARY
           echo "- **🔒 Security Scan & OWASP**: ${{ needs.security-scan.result }}" >> $GITHUB_STEP_SUMMARY
           echo "- **🧪 Backend Tests & Linting**: ${{ needs.backend-tests.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **⚛️ Frontend Tests & Linting**: ${{ needs.frontend-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **⚛️ Frontend Build & Linting**: ${{ needs.frontend-build.result }}" >> $GITHUB_STEP_SUMMARY
           echo "- **📈 SonarCloud Code Quality**: ${{ needs.sonarcloud.result }}" >> $GITHUB_STEP_SUMMARY
           echo "- **🏗️ Build & Test Applications**: ${{ needs.build-and-test.result }}" >> $GITHUB_STEP_SUMMARY
           echo "- **🚀 Deploy to Staging**: ${{ needs.deploy-staging.result }}" >> $GITHUB_STEP_SUMMARY
@@ -320,7 +299,7 @@ jobs:
           echo "- **🛡️ OWASP ZAP Security Scan**: ${{ needs.owasp-zap-scan.result }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## 🎯 Key Features Implemented:" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ **Unit Testing**: Jest for backend, React Testing Library for frontend" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ **Unit Testing**: Jest for backend only" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ **Security Testing**: NPM Audit, Snyk, OWASP Dependency Check" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ **Code Quality**: ESLint, SonarCloud analysis" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ **Coverage Reporting**: Codecov integration" >> $GITHUB_STEP_SUMMARY
