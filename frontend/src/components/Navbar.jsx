@@ -1,7 +1,7 @@
-// ReactRouter. 2025. NavLink. React Router. [online]. Available at: 
+// ReactRouter. 2025. NavLink. React Router. [online]. Available at:
 // <https://reactrouter.com/api/components/NavLink> [Accessed 1 October 2025].
 import { NavLink, useNavigate } from "react-router-dom";
-// NPM. 2025. react-icons. npmjs. [online]. Available at: 
+// NPM. 2025. react-icons. npmjs. [online]. Available at:
 // <https://www.npmjs.com/package/react-icons> [Accessed 1 October 2025].
 import {
   FaSignOutAlt,
@@ -10,7 +10,7 @@ import {
   FaHistory,
 } from "react-icons/fa";
 import api from "../lib/axios";
-import { toast, Slide } from "react-toastify";
+import { showErrorToast, showSuccessToast } from "../utils/toastHelper";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -29,16 +29,7 @@ export default function Navbar() {
         document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
       });
 
-      toast.success(res.data.message || "Logged out successfully", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "light",
-        transition: Slide,
-      });
+      showSuccessToast(res.data.message || "Logged out successfully");
       
       navigate("/login");
     } catch (err) {
@@ -46,16 +37,7 @@ export default function Navbar() {
       sessionStorage.clear();
       localStorage.clear();
       
-      toast.error(err.response?.data?.error || "Logout failed", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "light",
-        transition: Slide,
-      });
+      showErrorToast(err.response?.data?.error || "Logout failed");
       
       navigate("/login");
     }
@@ -74,10 +56,10 @@ export default function Navbar() {
       : "absolute bottom-0 left-0 w-0 h-0.5 bg-[#007768] group-hover:w-full transition-all duration-300";
 
   return (
-    <nav className="bg-white shadow-lg py-4 w-full fixed top-0 z-50">
-      <div className="flex items-center justify-between w-full">
-        <h1 className="text-2xl font-bold text-[#007768] flex items-center space-x-1 ml-4">
-          <FaMoneyCheckAlt className="text-3xl animate-bounce-slow" />
+    <nav className="bg-white shadow-lg py-3 sm:py-4 w-full fixed top-0 z-50">
+      <div className="flex flex-col sm:flex-row items-center justify-between w-full px-2 sm:px-0 gap-2 sm:gap-0">
+        <h1 className="text-xl sm:text-2xl font-bold text-[#007768] flex items-center space-x-1 sm:ml-4">
+          <FaMoneyCheckAlt className="text-2xl sm:text-3xl animate-bounce-slow" />
           <NavLink
             to="/"
             className="hover:text-[#005f57] transition duration-300"
@@ -86,7 +68,7 @@ export default function Navbar() {
           </NavLink>
         </h1>
         {user && (
-          <div className="flex space-x-6 absolute left-1/2 transform -translate-x-1/2 text-lg">
+          <div className="flex flex-wrap justify-center space-x-3 sm:space-x-6 sm:absolute sm:left-1/2 sm:transform sm:-translate-x-1/2 text-sm sm:text-base lg:text-lg">
             <NavLink
               to="/pastPayments"
               className={({ isActive }) =>
@@ -102,7 +84,8 @@ export default function Navbar() {
                     : normalIconClass
                 }
               />
-              <span>Past Payments</span>
+              <span className="hidden sm:inline">Past Payments</span>
+              <span className="sm:hidden">Payments</span>
               <span className={getUnderlineClass("/pastPayments")}></span>
             </NavLink>
             <NavLink
@@ -120,24 +103,26 @@ export default function Navbar() {
                     : normalIconClass
                 }
               />
-              <span>Make a Payment</span>
+              <span className="hidden sm:inline">Make a Payment</span>
+              <span className="sm:hidden">Pay</span>
               <span className={getUnderlineClass("/createPayment")}></span>
             </NavLink>
           </div>
         )}
-        <div className="flex items-center space-x-4 pr-4 text-lg">
+        <div className="flex items-center space-x-2 sm:space-x-4 sm:pr-4 text-sm sm:text-base lg:text-lg">
           {user ? (
             <>
               <span className="text-gray-800 font-medium flex items-center space-x-1">
-                <FaUserCircle className="text-[#007768] text-xl transition-transform duration-300 group-hover:scale-110" />
-                <span>Welcome, {user}</span>
+                <FaUserCircle className="text-[#007768] text-lg sm:text-xl transition-transform duration-300 group-hover:scale-110" />
+                <span className="hidden md:inline">Welcome, {user}</span>
+                <span className="md:hidden">{user.split(' ')[0]}</span>
               </span>
               <button
                 onClick={handleLogout}
-                className="bg-[#007768] text-white px-3 py-1.5 rounded-full flex items-center space-x-1 hover:bg-[#005f57] shadow-md hover:shadow-lg transition transform hover:scale-105"
+                className="bg-[#007768] text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-full flex items-center space-x-1 hover:bg-[#005f57] shadow-md hover:shadow-lg transition transform hover:scale-105 text-sm sm:text-base"
               >
                 <FaSignOutAlt className="text-white" />
-                <span>Logout</span>
+                <span className="hidden sm:inline">Logout</span>
               </button>
             </>
           ) : (
@@ -145,7 +130,7 @@ export default function Navbar() {
               <NavLink
                 to="/login"
                 className={({ isActive }) =>
-                  `px-3 py-1.5 rounded-full border border-[#007768] ${
+                  `px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border border-[#007768] text-sm sm:text-base ${
                     isActive ? "bg-[#007768] text-white" : "text-[#007768]"
                   } hover:bg-[#005f57] hover:text-white transition transform hover:scale-105`
                 }
@@ -155,7 +140,7 @@ export default function Navbar() {
               <NavLink
                 to="/register"
                 className={({ isActive }) =>
-                  `px-3 py-1.5 rounded-full border border-[#007768] ${
+                  `px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border border-[#007768] text-sm sm:text-base ${
                     isActive ? "bg-[#007768] text-white" : "text-[#007768]"
                   } hover:bg-[#005f57] hover:text-white transition transform hover:scale-105`
                 }
