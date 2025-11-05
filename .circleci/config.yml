@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   node: circleci/node@5.1.0
+  snyk: snyk/snyk@1.7.3
 
 # Define workflows
 workflows:
@@ -53,24 +54,18 @@ jobs:
             cd frontend
             npm audit --audit-level=moderate --production || true
             npm audit --json > audit-results-frontend.json || true
-      - run:
-          name: Install Snyk CLI
-          command: npm install -g snyk
-      - run:
-          name: Authenticate Snyk
-          command: snyk auth $SNYK_TOKEN
-      - run:
-          name: Snyk Test Backend
-          command: |
-            cd backend
-            snyk test --severity-threshold=high || true
-            snyk monitor || true
-      - run:
-          name: Snyk Test Frontend
-          command: |
-            cd frontend
-            snyk test --severity-threshold=high || true
-            snyk monitor || true
+      - snyk/scan:
+          severity-threshold: high
+          fail-on-issues: false
+          monitor-on-build: true
+          project: backend/
+          additional-arguments: "--all-projects"
+      - snyk/scan:
+          severity-threshold: high
+          fail-on-issues: false
+          monitor-on-build: true
+          project: frontend/
+          additional-arguments: "--all-projects"
       - run:
           name: OWASP Dependency Check
           command: |
