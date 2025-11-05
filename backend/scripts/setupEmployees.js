@@ -54,11 +54,11 @@ async function setupEmployees() {
 
     // Insert employee into collection
     const result = await userCollection.insertOne(newEmployee);
-    console.log(`✅ Employee ${employee.username} created successfully with ID: ${result.insertedId}`);
+    console.log(`Employee ${employee.username} created successfully with ID: ${result.insertedId}`);
     console.log(`   Credentials: Username: ${employee.username}, Password: ${employee.password}`);
 
     console.log('Employee setup completed successfully!');
-    console.log('\n🔐 EMPLOYEE LOGIN CREDENTIALS:');
+    console.log('\nEMPLOYEE LOGIN CREDENTIALS:');
     console.log('================================');
     console.log(`Username: ${employee.username}`);
     console.log(`Account Number: ${employee.accountNumber}`);
