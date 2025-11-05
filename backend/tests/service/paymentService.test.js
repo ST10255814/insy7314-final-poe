@@ -4,7 +4,7 @@ const {
   CreatePayment,
   getPendingPayments,
   verifySwiftCode,
-  markPaymentAsSentToSwift
+  submitToSwift
 } = require('../../service/paymentService');
 
 // Mock the database module
@@ -156,7 +156,7 @@ describe('PaymentService', () => {
 
       const result = await getPendingPayments();
 
-      expect(paymentsCollection.find).toHaveBeenCalledWith({ status: 'pending' });
+      expect(paymentsCollection.find).toHaveBeenCalledWith({ status: { $in: ['pending', 'verified'] } });
       expect(result[0].customerName).toBe('John Doe');
       expect(result[0].customerUsername).toBe('johndoe');
     });
@@ -226,27 +226,28 @@ describe('PaymentService', () => {
     });
   });
 
-  describe('markPaymentAsSentToSwift', () => {
+  describe('submitToSwift', () => {
     const mockPaymentId = '507f1f77bcf86cd799439011';
+    const mockEmployee = { username: 'employee1' };
 
-    it('should mark payment as sent to SWIFT successfully', async () => {
+    it('should submit payment to SWIFT successfully', async () => {
       const mockPayment = {
         _id: new ObjectId(mockPaymentId),
-        status: 'verified',
-        verifiedBy: 'employee1'
+        status: 'verified'
       };
 
       paymentsCollection.findOne.mockResolvedValue(mockPayment);
       paymentsCollection.updateOne.mockResolvedValue({ matchedCount: 1 });
 
-      const result = await markPaymentAsSentToSwift(mockPaymentId);
+      const result = await submitToSwift(mockPaymentId, mockEmployee);
 
-      expect(result.status).toBe('submitted');
+      expect(result.status).toBe('verified');
       expect(paymentsCollection.updateOne).toHaveBeenCalledWith(
         { _id: new ObjectId(mockPaymentId) },
         expect.objectContaining({
           $set: expect.objectContaining({
-            status: 'submitted'
+            status: 'submitted to Swift',
+            verifiedBy: 'employee1'
           })
         })
       );
@@ -260,8 +261,8 @@ describe('PaymentService', () => {
 
       paymentsCollection.findOne.mockResolvedValue(mockPayment);
 
-      await expect(markPaymentAsSentToSwift(mockPaymentId))
-        .rejects.toThrow('Payment must be verified before it can be sent to SWIFT');
+      await expect(submitToSwift(mockPaymentId, mockEmployee))
+        .rejects.toThrow('Payment must be verified before submission to SWIFT');
     });
   });
 });
