@@ -17,5 +17,6 @@ router.get('/api/employee/pending-payments', requireHTTPS, checkEmployeeAuth, em
 router.post('/api/employee/verify-swift/:paymentId', requireHTTPS, validateCSRF, checkEmployeeAuth, employeeController.verifySwiftCode)
 router.post('/api/employee/submit-swift/:paymentId', requireHTTPS, validateCSRF, checkEmployeeAuth, employeeController.submitToSwift)
 router.get('/api/employee/submitted-payments', requireHTTPS, checkEmployeeAuth, employeeController.getSubmittedPayments)
+router.post('/api/employee/updateSwift/:paymentId', requireHTTPS, validateCSRF, checkEmployeeAuth, employeeController.UpdatePaymentStatus)
 
 module.exports = router

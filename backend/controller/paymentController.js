@@ -31,3 +31,13 @@ exports.CreatePayment = async (req, res) => {
     }
 };
 
+exports.UpdatePaymentStatus = async (req, res) => {
+    try { // Retrieved from checkAuth middleware
+        const { paymentId } = req.params;
+
+       await paymentService.markPaymentAsSentToSwift(paymentId);
+       res.status(200).json({ message: 'Payment status updated to sent to SWIFT' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};

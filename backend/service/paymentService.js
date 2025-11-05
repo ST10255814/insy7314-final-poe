@@ -170,18 +170,14 @@ async function submitToSwift(paymentId, employee) {
             throw new Error('Payment must be verified before submission to SWIFT');
         }
         
-        // Simulate SWIFT submission (in real world, this would be an API call to SWIFT network)
-        const swiftTransactionId = `SWIFT${Date.now()}${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
-        
         // Update payment status to submitted
         const result = await PaymentsCollection.updateOne(
             { _id: toObjectId(paymentId) },
             { 
                 $set: { 
                     status: 'submitted',
-                    submittedAt: new Date(),
-                    submittedBy: employee.username,
-                    swiftTransactionId: swiftTransactionId
+                    verifiedAt: new Date(),
+                    verifiedBy: employee.username,
                 }
             }
         );
@@ -189,12 +185,10 @@ async function submitToSwift(paymentId, employee) {
         if (result.matchedCount === 0) {
             throw new Error('Payment not found');
         }
-        
-        console.log(`Payment ${paymentId} submitted to SWIFT successfully with transaction ID: ${swiftTransactionId}`);
+
         return { 
-            message: 'Payment submitted to SWIFT successfully', 
-            status: 'submitted',
-            swiftTransactionId: swiftTransactionId
+            message: 'Payment verified', 
+            status: 'verified',
         };
     } catch (error) {
         console.error(`Error submitting to SWIFT: ${error.message}`);
@@ -231,4 +225,34 @@ async function getSubmittedPayments() {
     }
 }
 
-module.exports = { getAllPayments, CreatePayment, getPendingPayments, verifySwiftCode, submitToSwift, getSubmittedPayments };
+//update payment status to sent to swift
+async function markPaymentAsSentToSwift(paymentId) {
+    try{
+        const db = client.db('INSY7314-POE');
+        const PaymentsCollection = db.collection('Payments');
+
+        const payment = await PaymentsCollection.findOne({ _id: toObjectId(paymentId) });
+
+        if(!payment){
+            throw new Error('Payment not found');
+        }
+
+        await PaymentsCollection.updateOne(
+            { _id: toObjectId(paymentId) },
+            {
+                $set: {
+                    status: 'Sent to Swift',
+                    sentToSwiftAt: new Date(),
+                    swiftTransactionId: `SWIFT${Date.now()}${Math.floor(Math.random() * 1000)}`, // Simulated SWIFT transaction ID
+                    submittedAt: new Date(),
+                    submittedBy: payment.verifiedBy
+                }
+            }
+        );
+    }catch(error){
+        console.error(`Error marking payment as sent to SWIFT: ${error.message}`);
+        throw new Error('Error marking payment as sent to SWIFT');
+    }
+}
+
+module.exports = { getAllPayments, CreatePayment, getPendingPayments, verifySwiftCode, submitToSwift, getSubmittedPayments, markPaymentAsSentToSwift };
