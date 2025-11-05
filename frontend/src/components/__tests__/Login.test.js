@@ -5,6 +5,12 @@ import { ToastContainer } from 'react-toastify';
 import Login from '../Login';
 import api from '../../lib/axios';
 
+// Increase Jest timeout for async tests
+jest.setTimeout(10000);
+
+// Mock setTimeout to resolve immediately
+global.setTimeout = jest.fn((cb) => cb());
+
 // Mock the axios module
 jest.mock('../../lib/axios');
 const mockedApi = api;
@@ -35,12 +41,17 @@ describe('Login Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     sessionStorage.clear();
+    
+    // Mock the CSRF token request that happens on component mount
+    mockedApi.get.mockResolvedValue({
+      data: { csrfToken: 'mock-csrf-token' }
+    });
   });
 
   it('renders login form correctly', () => {
     renderLogin();
     
-    expect(screen.getByText('Sign In')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /sign in/i })).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Username')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Account number')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Password')).toBeInTheDocument();
@@ -123,7 +134,7 @@ describe('Login Component', () => {
     
     await waitFor(() => {
       expect(sessionStorage.getItem('user')).toBe('"Test User"');
-    }, { timeout: 7000 }); // Increased timeout due to artificial delay
+    });
     
     expect(sessionStorage.getItem('userRole')).toBe('Customer');
     expect(mockNavigate).toHaveBeenCalledWith('/pastPayments');
@@ -156,7 +167,7 @@ describe('Login Component', () => {
     
     await waitFor(() => {
       expect(sessionStorage.getItem('user')).toBe('"Test Employee"');
-    }, { timeout: 7000 });
+    });
     
     expect(sessionStorage.getItem('userRole')).toBe('Employee');
     expect(mockNavigate).toHaveBeenCalledWith('/employee/dashboard');
@@ -189,7 +200,7 @@ describe('Login Component', () => {
     
     await waitFor(() => {
       expect(showErrorToast).toHaveBeenCalledWith('Invalid credentials');
-    }, { timeout: 7000 });
+    });
   });
 
   it('validates form inputs and shows validation errors', async () => {
