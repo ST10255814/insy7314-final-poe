@@ -29,7 +29,7 @@ describe('checkEmployeeAuth Middleware', () => {
 
   describe('Token validation', () => {
     it('should pass authentication with valid employee token', async () => {
-      const mockEmployee = { id: 'employee123', username: 'employee', role: 'employee' };
+      const mockEmployee = { id: 'employee123', username: 'employee', role: 'Employee' };
       req.cookies.authToken = 'validtoken';
       jwt.verify.mockReturnValue(mockEmployee);
 

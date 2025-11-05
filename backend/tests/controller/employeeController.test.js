@@ -86,10 +86,9 @@ describe('Employee Controller', () => {
   });
 
   describe('submitToSwift', () => {
-    describe('submitToSwift', () => {
     it('should submit to SWIFT successfully', async () => {
       req.params.paymentId = 'payment123';
-      
+
       const mockResult = { success: true, message: 'Payment submitted to SWIFT' };
       paymentService.submitToSwift.mockResolvedValue(mockResult);
 
@@ -102,7 +101,7 @@ describe('Employee Controller', () => {
 
     it('should handle submission errors', async () => {
       req.params.paymentId = 'payment123';
-      
+
       paymentService.submitToSwift.mockRejectedValue(new Error('Submission failed'));
 
       await submitToSwift(req, res);

@@ -30,7 +30,7 @@ describe('Strict CSP Middleware', () => {
 
     expect(res.setHeader).toHaveBeenCalledWith(
       'Content-Security-Policy',
-      expect.stringContaining('default-src \'self\'')
+      expect.stringContaining('default-src \'none\'')
     );
     expect(next).toHaveBeenCalled();
   });
