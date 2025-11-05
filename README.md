@@ -123,74 +123,44 @@ frontend/
 └── package.json      # Dependencies
 ```---
 
-## 🔒 **Enterprise Security Framework**
+## 🔒 Enterprise Security Framework
 
-<div align="center">
+![Security](https://img.shields.io/badge/Security-Enterprise_Grade-red?style=flat-square)
+![OWASP](https://img.shields.io/badge/OWASP-Top_10_Protected-orange?style=flat-square)
+![Compliance](https://img.shields.io/badge/Compliance-PCI_DSS-blue?style=flat-square)
 
-### 🛡️ **Multi-Layer Security Architecture**
-
-![Security](https://img.shields.io/badge/Security-Enterprise_Grade-red?style=for-the-badge)
-![OWASP](https://img.shields.io/badge/OWASP-Top_10_Protected-orange?style=for-the-badge)
-![Compliance](https://img.shields.io/badge/Compliance-PCI_DSS-blue?style=for-the-badge)
-
-</div>
-
-<table>
-<tr>
-<td width="50%">
-
-### 🔐 **Authentication & Authorization**
+### 🔐 Authentication & Authorization
 - 🎫 **JWT Tokens** with HTTP-Only cookies
 - 👥 **Role-based Access** (Employee vs Customer)
 - 🔄 **Session Management** with secure settings
 - 🔒 **Password Hashing** using bcrypt (12 rounds)
 - ⏰ **Token Expiration** & refresh mechanisms
 
-</td>
-<td width="50%">
-
-### 🛡️ **Input Security**
+### 🛡️ Input Security
 - ✅ **RegEx Whitelist** validation for all inputs
 - 🚫 **XSS Protection** with input sanitization
 - 💉 **SQL Injection Prevention**
 - 📝 **Zod Schema** validation on frontend
 - 🔍 **Data Validation** at multiple layers
 
-</td>
-</tr>
-<tr>
-<td width="50%">
-
-### 🌐 **Network Security**
+### 🌐 Network Security
 - 🛡️ **CSRF Protection** with token validation
 - ⏱️ **Rate Limiting** (15 requests/15 minutes)
 - 🌍 **CORS Configuration** with whitelist
 - 🪖 **Helmet.js** security headers
 - 🔐 **HTTPS Enforcement** with SSL certificates
 
-</td>
-<td width="50%">
-
-### 🏗️ **Infrastructure Security**
+### 🏗️ Infrastructure Security
 - 📋 **Content Security Policy** (CSP)
 - 🔒 **Strict Transport Security** (HSTS)
 - 🔧 **Security Headers** configuration
 - 🌿 **Environment Variables** protection
 - 🔄 **Secure Cookie** settings
 
-</td>
-</tr>
-</table>
-
-<div align="center">
-
-### 🎯 **Security Standards Compliance**
-
+### Security Standards Compliance
 ![ISO27001](https://img.shields.io/badge/ISO_27001-Compliant-green)
 ![GDPR](https://img.shields.io/badge/GDPR-Ready-blue)
 ![SOC2](https://img.shields.io/badge/SOC_2-Type_I-purple)
-
-</div>
 
 ---
 
@@ -283,23 +253,13 @@ open -a "Google Chrome" --args --ignore-certificate-errors --user-data-dir="/tmp
 
 ---
 
-## 🧪 **Testing & Quality Assurance**
+## 🧪 Testing & Quality Assurance
 
-<div align="center">
+![Tests](https://img.shields.io/badge/Tests-Jest+Supertest-red?style=flat-square)
+![Coverage](https://img.shields.io/badge/Coverage-95%25+-brightgreen?style=flat-square)
+![Security](https://img.shields.io/badge/Security-OWASP_ZAP-orange?style=flat-square)
 
-### 📊 **Comprehensive Testing Suite**
-
-![Tests](https://img.shields.io/badge/Tests-Jest+Supertest-red?style=for-the-badge)
-![Coverage](https://img.shields.io/badge/Coverage-95%25+-brightgreen?style=for-the-badge)
-![Security](https://img.shields.io/badge/Security-OWASP_ZAP-orange?style=for-the-badge)
-
-</div>
-
-<table>
-<tr>
-<td width="50%">
-
-### 🔧 **Backend Testing**
+### 🔧 Backend Testing
 ```bash
 cd backend
 npm test                 # 🧪 Run all tests
@@ -308,16 +268,13 @@ npm run test:ci          # 🔄 CI with coverage
 npm run test:security    # 🛡️ Security tests
 ```
 
-**📋 Test Coverage:**
+**Test Coverage:**
 - ✅ Unit Tests: Authentication, Controllers
 - ✅ Integration Tests: API endpoints
 - ✅ Security Tests: OWASP validations
 - ✅ Performance Tests: Load testing
 
-</td>
-<td width="50%">
-
-### 🔐 **Security Testing**
+### 🔐 Security Testing
 ```bash
 npm run security:audit   # 📊 NPM audit
 npm run security:snyk    # 🔍 Snyk scan
@@ -325,28 +282,18 @@ npm run security:zap     # ⚡ OWASP ZAP
 npm run lint:security    # 🛡️ ESLint rules
 ```
 
-**🔍 Security Scans:**
+**Security Scans:**
 - ✅ Dependency vulnerabilities
 - ✅ Static code analysis
 - ✅ Dynamic security testing
 - ✅ Penetration testing automation
 
-</td>
-</tr>
-</table>
-
 ---
 
-## 🔄 **CI/CD Pipeline**
+## 🔄 CI/CD Pipeline
 
-<div align="center">
-
-### ⚙️ **Automated DevOps Workflow**
-
-![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)
-![SonarCloud](https://img.shields.io/badge/SonarCloud-F3702A?style=for-the-badge&logo=sonarcloud&logoColor=white)
-
-</div>
+![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat-square&logo=github-actions&logoColor=white)
+![SonarCloud](https://img.shields.io/badge/SonarCloud-F3702A?style=flat-square&logo=sonarcloud&logoColor=white)
 
 ### 🚀 **Pipeline Stages**
 
@@ -366,86 +313,24 @@ graph LR
     style F fill:#0891b2,stroke:#0e7490,stroke-width:3px,color:#fff
 ```
 
-### DevOps Workflow Details
-```mermaid
-graph TB
-    subgraph "Development"
-        Dev[👨‍💻 Developer] --> Commit[📝 Git Commit]
-        Commit --> Push[⬆️ Push to GitHub]
-    end
-    
-    subgraph "CI Pipeline"
-        Push --> Trigger[🔔 Trigger Actions]
-        Trigger --> Security[🛡️ Security Scan]
-        Trigger --> Tests[🧪 Unit Tests]
-        Trigger --> Integration[🔗 Integration Tests]
-        Security --> Quality[📊 Code Quality]
-        Tests --> Quality
-        Integration --> Quality
-    end
-    
-    subgraph "CD Pipeline"
-        Quality --> Build[🏗️ Build Application]
-        Build --> Deploy[🚀 Deploy to Staging]
-        Deploy --> Verify[✅ Verify Deployment]
-        Verify --> Prod[🌍 Production Release]
-    end
-    
-    style Dev fill:#4f46e5,stroke:#1e1b4b,stroke-width:2px,color:#fff
-    style Security fill:#dc2626,stroke:#b91c1c,stroke-width:2px,color:#fff
-    style Tests fill:#059669,stroke:#047857,stroke-width:2px,color:#fff
-    style Integration fill:#0891b2,stroke:#0e7490,stroke-width:2px,color:#fff
-    style Quality fill:#d97706,stroke:#b45309,stroke-width:2px,color:#fff
-    style Build fill:#7c3aed,stroke:#6d28d9,stroke-width:2px,color:#fff
-    style Deploy fill:#10b981,stroke:#047857,stroke-width:2px,color:#fff
-    style Prod fill:#f59e0b,stroke:#d97706,stroke-width:2px,color:#fff
-```
-
-<table>
-<tr>
-<td width="50%">
-
-### 🔄 **Workflow 1: Comprehensive CI/CD**
+### 🔄 Workflow 1: Comprehensive CI/CD
 - 🔐 **Security Scanning**: OWASP, Snyk
 - 🧪 **Testing Suite**: Unit, Integration, E2E
 - 🏗️ **Build Process**: Frontend & Backend
 - 📊 **Quality Analysis**: SonarCloud integration
 - 🚀 **Deployment**: Automated staging/production
 
-</td>
-<td width="50%">
-
-### 🛡️ **Workflow 2: Security-First**
+### 🛡️ Workflow 2: Security-First
 - 🔍 **SAST**: Static Application Security Testing
 - 📦 **Dependency Check**: Automated vulnerability scanning
 - 🔒 **License Compliance**: Legal compliance monitoring
 - 📋 **Security Reports**: Comprehensive vulnerability reports
 
-</td>
-</tr>
-</table>
-
-### ✅ **Quality Gates**
-- 🧪 **All tests must pass** (95%+ coverage required)
-- 🔐 **Security approval** (no high/critical vulnerabilities)
-- 📊 **Code quality metrics** meet standards
-- 📋 **Documentation** up to date
-
 ---
 
-## 🛠️ **Development Commands**
+## 🛠️ Development Commands
 
-<div align="center">
-
-### ⚡ **Quick Reference Guide**
-
-</div>
-
-<table>
-<tr>
-<td width="50%">
-
-### 🔧 **Backend Commands**
+### 🔧 Backend Commands
 ```bash
 npm start              # 🚀 Production server
 npm run dev            # 🔧 Development mode
@@ -455,10 +340,7 @@ npm run lint:fix       # 🔧 Auto-fix issues
 npm run security:audit # 🔐 Security audit
 ```
 
-</td>
-<td width="50%">
-
-### ⚛️ **Frontend Commands**
+### ⚛️ Frontend Commands
 ```bash
 npm start              # 🔧 Development server
 npm run build          # 🏗️ Production build
@@ -468,90 +350,50 @@ npm run lint:fix       # 🔧 Auto-fix issues
 npm run analyze        # 📊 Bundle analysis
 ```
 
-</td>
-</tr>
-</table>
-
 ---
 
-## 🔐 **Security & Compliance**
-
-<div align="center">
-
-### 🛡️ **Industry Standards Compliance**
+## 🔐 Security & Compliance
 
 ![OWASP](https://img.shields.io/badge/OWASP-Top_10_Protected-red)
 ![PCI](https://img.shields.io/badge/PCI_DSS-Considerations-blue)
 ![GDPR](https://img.shields.io/badge/GDPR-Compliant-green)
 ![ISO](https://img.shields.io/badge/ISO_27001-Aligned-purple)
 
-</div>
-
-<table>
-<tr>
-<td width="50%">
-
-### 📋 **Standards Compliance**
+### 📋 Standards Compliance
 - 🛡️ **OWASP Top 10** protection measures
 - 💳 **PCI DSS** considerations for payments
 - 🔒 **GDPR** data protection principles
 - 📊 **ISO 27001** security management
 - 🔐 **SOC 2** compliance framework
 
-</td>
-<td width="50%">
-
-### 🧪 **Security Testing**
+### 🧪 Security Testing
 - 🎯 **Penetration Testing**: Manual & automated
 - 🔍 **Vulnerability Scanning**: OWASP ZAP
 - 📊 **Code Analysis**: Static analysis with SonarCloud
 - 📦 **Dependency Auditing**: Continuous monitoring
 - 🔄 **Regular Security Reviews**
 
-</td>
-</tr>
-</table>
-
 ---
 
-## 🎥 **Demo & Resources**
+## 🎥 Demo Videos
 
-<div align="center">
+### 🔧 Backend API Walkthrough
+[![Backend Demo](https://img.shields.io/badge/Watch-Backend_Demo-red?style=flat-square&logo=youtube)](https://youtu.be/1fQPPgvUX4Q)
 
-### ▶️ **Video Demonstrations**
-
-[![YouTube](https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtube.com)
-
-</div>
-
-<table>
-<tr>
-<td width="50%" align="center">
-
-### 🔧 **Backend API Walkthrough**
-[![Backend Demo](https://img.shields.io/badge/Watch-Backend_Demo-red?style=for-the-badge&logo=youtube)](https://youtu.be/1fQPPgvUX4Q)
-
-**🔍 Covers:**
+**Covers:**
 - API endpoints demonstration
 - Security features showcase
 - Database interactions
 - Authentication flow
 
-</td>
-<td width="50%" align="center">
+### 💳 Frontend Payment Gateway
+[![Frontend Demo](https://img.shields.io/badge/Watch-Frontend_Demo-blue?style=flat-square&logo=youtube)](https://youtu.be/DrvEL8eiAYk)
 
-### 💳 **Frontend Payment Gateway**
-[![Frontend Demo](https://img.shields.io/badge/Watch-Frontend_Demo-blue?style=for-the-badge&logo=youtube)](https://youtu.be/DrvEL8eiAYk)
-
-**🎯 Highlights:**
+**Highlights:**
 - User interface walkthrough
 - Payment flow demonstration
 - Security features in action
 - Responsive design showcase
-
-</td>
-</tr>
-</table>
 
 ---
 
