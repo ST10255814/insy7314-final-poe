@@ -4,7 +4,6 @@
 
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
 ![Security](https://img.shields.io/badge/security-A+-green)
-![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen)
 ![Node](https://img.shields.io/badge/node-18+-blue)
 ![License](https://img.shields.io/badge/license-Academic-orange)
 
@@ -52,7 +51,7 @@ PayFlow is a comprehensive secure payment portal designed for international tran
 ### ⚡ Technical Features  
 - Real-time payment processing
 - Employee and customer portals
-- Comprehensive test coverage (95%+)
+- Comprehensive backend test coverage (95%+)
 - Automated CI/CD pipeline
 - SonarCloud integration for code quality
 
