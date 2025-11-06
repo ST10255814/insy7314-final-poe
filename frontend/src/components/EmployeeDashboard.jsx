@@ -21,7 +21,7 @@ export default function EmployeeDashboard() {
   const fetchPendingPayments = async () => {
     try {
       setLoading(true);
-      const response = await api.get("/api/employee/pending-payments");
+      const response = await api.get("/api/employee/pending-payments", {withCredentials: true});
       setPendingPayments(response.data);
     } catch (error) {
       showErrorToast(error.response?.data?.error || "Failed to fetch pending payments");
@@ -36,7 +36,7 @@ export default function EmployeeDashboard() {
       
       const response = await api.post(`/api/employee/verify-swift/${paymentId}`, {
         swiftCode: swiftCode
-      });
+      }, { withCredentials: true });
       
       showSuccessToast(response.data.message);
       
@@ -59,9 +59,9 @@ export default function EmployeeDashboard() {
   const submitToSwift = async (paymentId) => {
     try {
       setSubmittingSwift(prev => ({ ...prev, [paymentId]: true }));
-      
-      const response = await api.post(`/api/employee/submit-swift/${paymentId}`);
-      
+
+      const response = await api.post(`/api/employee/submit-swift/${paymentId}`, {}, { withCredentials: true });
+
       showSuccessToast(response.data.message);
       
       // Remove the payment from pending list

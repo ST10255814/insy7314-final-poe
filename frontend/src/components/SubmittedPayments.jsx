@@ -19,7 +19,7 @@ export default function SubmittedPayments() {
   const fetchSubmittedPayments = async () => {
     try {
       setLoading(true);
-      const response = await api.get("/api/employee/submitted-payments");
+      const response = await api.get("/api/employee/submitted-payments", {withCredentials: true});
       setSubmittedPayments(response.data);
     } catch (error) {
       showErrorToast(error.response?.data?.error || "Failed to fetch submitted payments");
